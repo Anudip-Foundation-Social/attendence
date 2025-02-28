@@ -327,9 +327,9 @@ class AttendanceController extends Controller
                         Photo::create(['user_id' => $x['user_id'],'attendance_id'=>$lastId,'punch_type'=>'I','photo_name'=>$input['file'],'lat'=>$x['lat'],'long'=>$x['long'],'place'=>$x['location'],'punch_time'=>$x['punch_in'],'punch_date'=>$x['attend_date'],'member_code'=>trim($x['member_code'])]);
                     }else{
 
-                        if(sizeof($details)>0){
+                        if(sizeof($$details1)>0){
 
-                            Attendance::where('atten_date', $x['attend_date'])->where('user_id', $details[0]->user_id)->update(['punch_out'=>$x['punch_out'],'punch_out_lat'=>$x['lat'],'punch_out_long'=>$x['long'],'status'=>0,'punch_out_place'=>$x['location']]);
+                            Attendance::where('atten_date', $x['attend_date'])->where('user_id', $$details1[0]->user_id)->update(['punch_out'=>$x['punch_out'],'punch_out_lat'=>$x['lat'],'punch_out_long'=>$x['long'],'status'=>0,'punch_out_place'=>$x['location']]);
 
                             Photo::create(['user_id' => $x['user_id'],'attendance_id'=>$lastId,'punch_type'=>'O','photo_name'=>$input['file'],'lat'=>$x['lat'],'long'=>$x['long'],'place'=>$x['location'],'punch_time'=>$x['punch_out'],'punch_date'=>$x['attend_date'],'member_code'=>trim($x['member_code'])]);
 
