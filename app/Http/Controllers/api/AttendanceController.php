@@ -237,8 +237,8 @@ class AttendanceController extends Controller
             foreach($request->details as $x){
               
                 //return Response(['message' => 'inserted successfully','status'=>1,'data11'=>$request->details],200);
-
-                return Response(['message' => 'inserted successfully vvv','status'=>1,'data11'=>$x['attend_date']],200);
+                 $x=json_encode($x);
+                return Response(['message' => 'inserted successfully vvv','status'=>1,'data11'=>$x->member_code],200);
 
                     if(str_starts_with($x->member_code, 'AF')){
                     $member_type='student';
