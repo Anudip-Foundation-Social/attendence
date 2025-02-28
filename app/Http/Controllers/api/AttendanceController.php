@@ -341,9 +341,6 @@ class AttendanceController extends Controller
                             Photo::create(['user_id' => $x['user_id'],'attendance_id'=>$lastId,'punch_type'=>'O','photo_name'=>$input['file'],'lat'=>$x['lat'],'long'=>$x['long'],'place'=>'demo','punch_time'=>$x['punch_out'],'punch_date'=>$x['attend_date'],'member_code'=>trim($x['member_code'])]);
                             
                         }
-
-                      
-                        
                     }
 
                     
