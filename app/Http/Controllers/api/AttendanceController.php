@@ -238,7 +238,7 @@ class AttendanceController extends Controller
               
                 //return Response(['message' => 'inserted successfully','status'=>1,'data11'=>$request->details],200);
 
-                return Response(['message' => 'inserted successfully vvv','status'=>1,'data11'=>$x],200);
+                return Response(['message' => 'inserted successfully vvv','status'=>1,'data11'=>$x['attend_date']],200);
 
                     if(str_starts_with($x->member_code, 'AF')){
                     $member_type='student';
