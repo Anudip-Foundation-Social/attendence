@@ -231,10 +231,11 @@ class AttendanceController extends Controller
        // DB::beginTransaction();
         try { 
             //return $request->details;
-            //return Response(['message' => 'inserted successfully','status'=>1,'data11'=>$request->details],200);
+            //
             date_default_timezone_set('Asia/Kolkata');
 
             foreach($request->details as $x){
+                return Response(['message' => 'inserted successfully','status'=>1,'data11'=>$request->details],200);
 
                 
 
