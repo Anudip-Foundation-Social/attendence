@@ -238,7 +238,7 @@ class AttendanceController extends Controller
               
                 //return Response(['message' => 'inserted successfully','status'=>1,'data11'=>$request->details],200);
 
-                
+                return Response(['message' => 'inserted successfully vvv','status'=>1,'data11'=>$x],200);
 
                     if(str_starts_with($x->member_code, 'AF')){
                     $member_type='student';
@@ -253,7 +253,7 @@ class AttendanceController extends Controller
                     //     $attn_type='present';
                     // }
                     //     $attn_type='past
-                    return Response(['message' => 'inserted successfully vvv','status'=>1,'data11'=>$x],200);
+                    
                     $details1 = Attendance::where('atten_date', $x->attend_date)->where('user_id', $x->user_id)->get();
                     
                     if($x->image!=''){
