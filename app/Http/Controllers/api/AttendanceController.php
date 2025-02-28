@@ -237,10 +237,10 @@ class AttendanceController extends Controller
             foreach($request->details as $x){
               
                 //return Response(['message' => 'inserted successfully','status'=>1,'data11'=>$request->details],200);
-                 $x=json_encode($x);
-                return Response(['message' => 'inserted successfully vvv','status'=>1,'data11'=>$x->member_code],200);
+                 //$x=json_encode($x);
+                //return Response(['message' => 'inserted successfully vvv','status'=>1,'data11'=>$x->member_code],200);
 
-                    if(str_starts_with($x->member_code, 'AF')){
+                    if(str_starts_with($x['member_code'], 'AF')){
                     $member_type='student';
                     }else{
                     $member_type='staff';
@@ -254,12 +254,12 @@ class AttendanceController extends Controller
                     // }
                     //     $attn_type='past
                     
-                    $details1 = Attendance::where('atten_date', $x->attend_date)->where('user_id', $x->user_id)->get();
+                    $details1 = Attendance::where('atten_date', $x['attend_date'])->where('user_id', $x->user_id)->get();
                     
                     if($x->image!=''){
-                        $s3_path="attendance/".trim($x->attend_date)."/";
-                        $folderPath = "volume_blr1_01/".trim($x->attend_date)."/";
-                        $base64Image = explode(";base64,", $x->image);
+                        $s3_path="attendance/".trim($x['attend_date'])."/";
+                        $folderPath = "volume_blr1_01/".trim($x['attend_date'])."/";
+                        $base64Image = explode(";base64,", $x['image']);
                         $explodeImage = explode("image/", $base64Image[0]);
                         $imageType = $explodeImage[1];
                         $image_base64 = base64_decode($base64Image[1]);
@@ -271,7 +271,7 @@ class AttendanceController extends Controller
                         //dd('end');
                         $path = 'https://attendanceapi.anudip.org/'.$file;//need some changes
                         $filename = basename($path);
-                        $input['file'] = trim($x->member_code)."_".$x->attend_date."_".time().'.jpg';
+                        $input['file'] = trim($x['member_code'])."_".$x['attend_date']."_".time().'.jpg';
 
                         $imgFile = Image::make($path)->resize(200, 200, function ($constraint) {
                             $constraint->aspectRatio();
@@ -295,7 +295,7 @@ class AttendanceController extends Controller
                         $input['file']='NA'; 
                     }    
 
-                    $postParameter = ['user_id' => $x->user_id,'atten_date' => $x->attend_date,'punch_in'=>$request->punch_in,'punch_in'=>$request->punch_out,'lat'=>$x->lat,'long'=>$x->long,'member_id'=>$x->member_id,'member_code'=>$x->member_code,'status'=>2,'transfer_status'=>1,'atten_type'=>$attn_type,'member_type'=>$member_type,'punch_in_place'=>'','reason'=>$x->reason,'center_id'=>$x->center_id,'photo'=>$input['file'],'batch_id'=>$x->batch_id,'batch_code'=>$x->batch_code];
+                    $postParameter = ['user_id' => $x['user_id'],'atten_date' => $x['attend_date'],'punch_in'=>$x['punch_in'],'punch_in'=>$x['punch_out'],'lat'=>$x['lat'],'long'=>$x['long'],'member_id'=>$x['member_id'],'member_code'=>$x['member_code'],'status'=>2,'transfer_status'=>1,'atten_type'=>$attn_type,'member_type'=>$member_type,'punch_in_place'=>'','reason'=>$x['reason'],'center_id'=>$x['center_id'],'photo'=>$input['file'],'batch_id'=>$x['batch_id'],'batch_code'=>$x['batch_code']];
                     // if(sizeof($details)>0){
                     //     //dd($details[0]->id);
                     //     $curlHandle = curl_init('https://cmis3api.anudip.org/api/insertFromAttenApp');
@@ -322,20 +322,22 @@ class AttendanceController extends Controller
                     
                    
 
-                    if($request->punch_out!=null){
+                    if($x['punch_out']!=null){
                         $lastId=Attendance::create($postParameter)->id;
-                        Photo::create(['user_id' => $x->user_id,'attendance_id'=>$lastId,'punch_type'=>'I','photo_name'=>$input['file'],'lat'=>$x->lat,'long'=>$x->long,'place'=>$x->location,'punch_time'=>$request->punch_in,'punch_date'=>$x->attend_date,'member_code'=>trim($x->member_code)]);
+                        Photo::create(['user_id' => $x['user_id'],'attendance_id'=>$lastId,'punch_type'=>'I','photo_name'=>$input['file'],'lat'=>$x['lat'],'long'=>$x['long'],'place'=>$x['location'],'punch_time'=>$x['punch_in'],'punch_date'=>$x['attend_date'],'member_code'=>trim($x['member_code'])]);
                     }else{
 
                         if(sizeof($details)>0){
 
-                            Attendance::where('atten_date', $x->attend_date)->where('user_id', $details[0]->user_id)->update(['punch_out'=>$request->punch_out,'punch_out_lat'=>$x->lat,'punch_out_long'=>$x->long,'status'=>0,'punch_out_place'=>$x->location]);
+                            Attendance::where('atten_date', $x['attend_date'])->where('user_id', $details[0]->user_id)->update(['punch_out'=>$x['punch_out'],'punch_out_lat'=>$x['lat'],'punch_out_long'=>$x['long'],'status'=>0,'punch_out_place'=>$x['location']]);
 
-                            Photo::create(['user_id' => $x->user_id,'attendance_id'=>$lastId,'punch_type'=>'O','photo_name'=>$input['file'],'lat'=>$x->lat,'long'=>$x->long,'place'=>$x->location,'punch_time'=>$request->punch_out,'punch_date'=>$x->attend_date,'member_code'=>trim($x->member_code)]);
+                            Photo::create(['user_id' => $x['user_id'],'attendance_id'=>$lastId,'punch_type'=>'O','photo_name'=>$input['file'],'lat'=>$x['lat'],'long'=>$x['long'],'place'=>$x['location'],'punch_time'=>$x['punch_out'],'punch_date'=>$x['attend_date'],'member_code'=>trim($x['member_code'])]);
 
                         }else{
                             $lastId=Attendance::create($postParameter)->id;
-                            Photo::create(['user_id' => $x->user_id,'attendance_id'=>$lastId,'punch_type'=>'I','photo_name'=>$input['file'],'lat'=>$x->lat,'long'=>$x->long,'place'=>$x->location,'punch_time'=>$request->punch_in,'punch_date'=>$x->attend_date,'member_code'=>trim($x->member_code)]);
+                            Photo::create(['user_id' => $x['user_id'],'attendance_id'=>$lastId,'punch_type'=>'I','photo_name'=>$input['file'],'lat'=>$x['lat'],'long'=>$x['long'],'place'=>$x['location'],'punch_time'=>$x['punch_out'],'punch_date'=>$x['attend_date'],'member_code'=>trim($x['member_code'])]);
+                            
+                            Photo::create(['user_id' => $x['user_id'],'attendance_id'=>$lastId,'punch_type'=>'O','photo_name'=>$input['file'],'lat'=>$x['lat'],'long'=>$x['long'],'place'=>$x['location'],'punch_time'=>$x['punch_out'],'punch_date'=>$x['attend_date'],'member_code'=>trim($x['member_code'])]);
                             
                         }
 
@@ -345,7 +347,7 @@ class AttendanceController extends Controller
 
                     
                     //curl_close($curlHandle);
-                    $x=['punch_in'=>$time,'date' => $x->attend_date];
+                    //$x=['punch_in'=>$time,'date' => $x['attend_date']];
                     DB::commit();
             }    
             return Response(['message' => 'inserted successfully','status'=>1,'data'=>$x],200);
