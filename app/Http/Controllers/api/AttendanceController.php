@@ -295,7 +295,7 @@ class AttendanceController extends Controller
                         $input['file']='NA'; 
                     }    
                     $attn_type='present';
-                    $postParameter = ['user_id' => $x['user_id'],'atten_date' => $x['attend_date'],'punch_in'=>$x['punch_in'],'punch_in'=>$x['punch_out'],'lat'=>$x['lat'],'long'=>$x['long'],'member_id'=>$x['member_id'],'member_code'=>$x['member_code'],'status'=>2,'transfer_status'=>1,'atten_type'=>$attn_type,'member_type'=>$member_type,'punch_in_place'=>'','reason'=>$x['reason'],'center_id'=>$x['center_id'],'photo'=>$input['file'],'batch_id'=>$x['batch_id'],'batch_code'=>$x['batch_code']];
+                    $postParameter = ['user_id' => $x['user_id'],'atten_date' => $x['attend_date'],'punch_in'=>$x['punch_in'],'punch_out'=>$x['punch_out'],'lat'=>$x['lat'],'long'=>$x['long'],'member_id'=>$x['member_id'],'member_code'=>$x['member_code'],'status'=>2,'transfer_status'=>1,'atten_type'=>$attn_type,'member_type'=>$member_type,'punch_in_place'=>'','reason'=>$x['reason'],'center_id'=>$x['center_id'],'photo'=>$input['file'],'batch_id'=>$x['batch_id'],'batch_code'=>$x['batch_code']];
                     // if(sizeof($details)>0){
                     //     //dd($details[0]->id);
                     //     $curlHandle = curl_init('https://cmis3api.anudip.org/api/insertFromAttenApp');
