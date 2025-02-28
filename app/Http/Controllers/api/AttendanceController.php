@@ -254,7 +254,7 @@ class AttendanceController extends Controller
                     // }
                     //     $attn_type='past
                     $details1 = Attendance::where('atten_date', $x->attend_date)->where('user_id', $x->user_id)->get();
-                    return Response(['message' => 'inserted successfully vvv','status'=>1,'data11'=>$details1],200);
+                    return Response(['message' => 'inserted successfully vvv','status'=>1,'data11'=>$x->attend_date],200);
                     if($x->image!=''){
                         $s3_path="attendance/".trim($x->attend_date)."/";
                         $folderPath = "volume_blr1_01/".trim($x->attend_date)."/";
