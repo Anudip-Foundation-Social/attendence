@@ -323,7 +323,7 @@ class AttendanceController extends Controller
                    
                      
                     if($x['punch_out']==null){
-                        dd('k');
+                        //dd('k');
                         $lastId=Attendance::create($postParameter)->id;
                         Photo::create(['user_id' => $x['user_id'],'attendance_id'=>$lastId,'punch_type'=>'I','photo_name'=>$input['file'],'lat'=>$x['lat'],'long'=>$x['long'],'place'=>'demo','punch_time'=>$x['punch_in'],'punch_date'=>$x['attend_date'],'member_code'=>trim($x['member_code'])]);
                     }else{
