@@ -245,13 +245,13 @@ class AttendanceController extends Controller
                     }else{
                     $member_type='staff';
                     }
-                    // if($request->attend_date<date('Y-m-d')){
-                    //     $time=$request->punch_time==''?date('H:i:s'):$request->punch_time;
-                    //     $attn_type='past';
-                    // }else{
-                    //     $time=date('H:i:s');
-                    //     $attn_type='present';
-                    // }
+                    if($x['attend_date']<date('Y-m-d')){
+                        //$time=$request->punch_time==''?date('H:i:s'):$request->punch_time;
+                        $attn_type='past';
+                    }else{
+                        $time=date('H:i:s');
+                        $attn_type='present';
+                    }
                     //     $attn_type='past
                     
                     $details1 = Attendance::where('atten_date', $x['attend_date'])->where('user_id', $x['user_id'])->get();
