@@ -254,7 +254,7 @@ class AttendanceController extends Controller
                     // }
                     //     $attn_type='past
                     
-                    $details1 = Attendance::where('atten_date', $x['attend_date'])->where('user_id', $x->user_id)->get();
+                    $details1 = Attendance::where('atten_date', $x['attend_date'])->where('user_id', $x['user_id'])->get();
                     
                     if($x->image!=''){
                         $s3_path="attendance/".trim($x['attend_date'])."/";
