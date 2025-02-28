@@ -233,7 +233,7 @@ class AttendanceController extends Controller
             //return $request->details;
             //
             date_default_timezone_set('Asia/Kolkata');
-
+            return Response(['message' => 'inserted successfully','status'=>1,'data11'=>sizeof($request->details)],200);
             foreach($request->details as $x){
                 return Response(['message' => 'inserted successfully','status'=>1,'data11'=>$request->details],200);
 
