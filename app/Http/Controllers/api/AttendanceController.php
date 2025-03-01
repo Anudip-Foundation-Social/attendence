@@ -361,7 +361,7 @@ class AttendanceController extends Controller
 
                             Photo::create(['user_id' => $x['user_id'],'attendance_id'=>$details1[0]->id,'punch_type'=>'O','photo_name'=>$input['file'],'lat'=>$x['lat'],'long'=>$x['long'],'place'=>'demo','punch_time'=>$x['punch_out'],'punch_date'=>$x['attend_date'],'member_code'=>trim($x['member_code'])]);
 
-                            DB::connection('mysql_2')->table('attendance_app')->where('atten_date', $x['attend_date'])->where('user_id', $details1[0]->user_id)->update(['punch_in'=>$x['punch_in'],'punch_out'=>$x['punch_out'],'punch_out_lat'=>$x['lat'],'punch_out_long'=>$x['long'],'punch_out_place'=>'demo','atten_type'=>$attn_type,'reason'=>$x['reason']]);
+                            DB::connection('mysql_2')->table('attendance_app')->where('atten_date', $x['attend_date'])->where('member_id', $x['member_id'])->update(['punch_in'=>$x['punch_in'],'punch_out'=>$x['punch_out'],'punch_out_lat'=>$x['lat'],'punch_out_long'=>$x['long'],'punch_out_place'=>'demo','atten_type'=>$attn_type,'reason'=>$x['reason']]);
 
                         }else{
                             Attendance::where('atten_date', $x['attend_date'])->where('user_id', $x['user_id'])->delete();
