@@ -245,14 +245,14 @@ class AttendanceController extends Controller
                     }else{
                     $member_type='staff';
                     }
-                    if($x['attend_date']<date('Y-m-d')){
-                        //$time=$request->punch_time==''?date('H:i:s'):$request->punch_time;
-                        $attn_type='past';
-                    }else{
-                        $time=date('H:i:s');
-                        $attn_type='present';
-                    }
-                    //     $attn_type='past
+                    // if($x['attend_date']<date('Y-m-d')){
+                    //     //$time=$request->punch_time==''?date('H:i:s'):$request->punch_time;
+                    //     $attn_type='past';
+                    // }else{
+                    //     $time=date('H:i:s');
+                    //     $attn_type='present';
+                    // }
+                    $attn_type=$x['attn_type'];
                     
                     $details1 = Attendance::where('atten_date', $x['attend_date'])->where('user_id', $x['user_id'])->get();
                     
@@ -335,6 +335,7 @@ class AttendanceController extends Controller
                             Photo::create(['user_id' => $x['user_id'],'attendance_id'=>$details1[0]->id,'punch_type'=>'O','photo_name'=>$input['file'],'lat'=>$x['lat'],'long'=>$x['long'],'place'=>'demo','punch_time'=>$x['punch_out'],'punch_date'=>$x['attend_date'],'member_code'=>trim($x['member_code'])]);
 
                         }else{
+                            $postParameter['status']=0;
                             $lastId=Attendance::create($postParameter)->id;
                             Photo::create(['user_id' => $x['user_id'],'attendance_id'=>$lastId,'punch_type'=>'I','photo_name'=>$input['file'],'lat'=>$x['lat'],'long'=>$x['long'],'place'=>'demo','punch_time'=>$x['punch_out'],'punch_date'=>$x['attend_date'],'member_code'=>trim($x['member_code'])]);
                             
