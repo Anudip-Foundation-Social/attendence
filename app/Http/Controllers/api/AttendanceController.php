@@ -407,7 +407,7 @@ class AttendanceController extends Controller
                                 'member_code'=>$x['member_code'],
                                 'status'=>0,
                                 'punch_place'=>'',
-                                'atten_type'=>$atten_type,
+                                'atten_type'=>$attn_type,
                                 'member_type'=>$member_type,
                                 'reason'=>$x['reason'],
                                 'center_id'=>$x['center_id'],
