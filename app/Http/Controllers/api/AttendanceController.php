@@ -389,7 +389,7 @@ class AttendanceController extends Controller
                             Attendance::where('atten_date', $x['attend_date'])->where('user_id', $x['user_id'])->delete();
                             $postParameter['status']=0;
                             $lastId=Attendance::create($postParameter)->id;
-                            Photo::create(['user_id' => $x['user_id'],'attendance_id'=>$lastId,'punch_type'=>'I','photo_name'=>$input['file'],'lat'=>$x['lat'],'long'=>$x['long'],'place'=>'demo','punch_time'=>$x['punch_out'],'punch_date'=>$x['attend_date'],'member_code'=>trim($x['member_code'])]);
+                            Photo::create(['user_id' => $x['user_id'],'attendance_id'=>$lastId,'punch_type'=>'I','photo_name'=>$input['file'],'lat'=>$x['lat'],'long'=>$x['long'],'place'=>'demo','punch_time'=>$x['punch_in'],'punch_date'=>$x['attend_date'],'member_code'=>trim($x['member_code'])]);
                             
                             Photo::create(['user_id' => $x['user_id'],'attendance_id'=>$lastId,'punch_type'=>'O','photo_name'=>$input['file'],'lat'=>$x['lat'],'long'=>$x['long'],'place'=>'demo','punch_time'=>$x['punch_out'],'punch_date'=>$x['attend_date'],'member_code'=>trim($x['member_code'])]);
 
