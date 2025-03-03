@@ -654,7 +654,6 @@ class AttendanceController extends Controller
 
         $centers= DB::connection('mysql_2')->table('users as u')
                     ->leftJoin('users_roles as ur', 'u.id', '=', 'ur.user_id')
-                    ->leftJoin('users as u', 'u.id', '=', 'ur.user_id')
                     ->leftJoin('centers as c', 'ur.center_id', '=', 'c.id')
                     ->where('u.user_id', strtoupper($username))
                     ->where('ur.role_id', 7)
@@ -675,7 +674,7 @@ class AttendanceController extends Controller
                   ->get(['m.first_name as first_name','m.last_name as last_name','m.member_code as member_code','m.id as member_id','e.batch_id as batch_id']);
 
          return Response(['centers' => $centers,'batches' => $batches,'members' => $members],200);
-       return Response(['center_details' => $details_from_cmis],200);            
+      // return Response(['center_details' => $details_from_cmis],200);            
 
        }catch(\Exception $e){
         DB::rollback();
