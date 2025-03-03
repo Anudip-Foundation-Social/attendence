@@ -679,7 +679,8 @@ class AttendanceController extends Controller
 
        }catch(\Exception $e){
         DB::rollback();
-        return $this->sendError($e->getMessage());
+        dd($e);
+        //return $this->sendError($e->getMessage());
       }
     }
 }
