@@ -437,7 +437,7 @@ class AttendanceController extends Controller
                                 'punch_type'=>"O",
                                 'photo'=>$input['file'],
                                 'batch_code'=>$x['batch_code'],
-                                'update_attn_status'=>$x['bulk_type']==1?1:0,
+                                'update_attn_status'=>0,
                             ]);
                             
                         }
