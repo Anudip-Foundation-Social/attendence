@@ -44,5 +44,5 @@ Route::group(['middleware' => 'auth:sanctum'],function(){
     Route::get('fetch-student-by-batch/{batch_id}',[TrainerController::class,'fetchStudentByBatch']);
     Route::post('store-bulk-punchin-out-attendance',[TrainerController::class,'storeBulkPunchInOutAttendance']);
 
-    Route::get('fetchAllDetailsForTrainer/{username}',[TrainerController::class,'fetchAllDetailsForTrainer']);
+    Route::get('fetchAllDetailsForTrainer/{username}',[AttendanceController::class,'fetchAllDetailsForTrainer']);
 });
