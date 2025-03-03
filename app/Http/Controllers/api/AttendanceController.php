@@ -340,7 +340,7 @@ class AttendanceController extends Controller
                             'long'=>$x['long'],
                             'member_id'=>$x['member_id'],
                             'member_code'=>$x['member_code'],
-                            'status'=>$x['bulk_type']==1?1:0,
+                            'status'=>0,
                             'punch_place'=>'',
                             'atten_type'=>$atten_type,
                             'member_type'=>$member_type,
@@ -349,7 +349,7 @@ class AttendanceController extends Controller
                             'punch_type'=>"I",
                             'photo'=>$input['file'],
                             'batch_code'=>$x['batch_code'],
-                            'update_attn_status'=>$x['bulk_type']==1?1:0,
+                            'update_attn_status'=>0,
                         ]);
 
 
@@ -405,7 +405,7 @@ class AttendanceController extends Controller
                                 'long'=>$x['long'],
                                 'member_id'=>$x['member_id'],
                                 'member_code'=>$x['member_code'],
-                                'status'=>$x['bulk_type']==1?1:0,
+                                'status'=>0,
                                 'punch_place'=>'',
                                 'atten_type'=>$atten_type,
                                 'member_type'=>$member_type,
@@ -414,7 +414,7 @@ class AttendanceController extends Controller
                                 'punch_type'=>"I",
                                 'photo'=>$input['file'],
                                 'batch_code'=>$x['batch_code'],
-                                'update_attn_status'=>$x['bulk_type']==1?1:0,
+                                'update_attn_status'=>0,
                             ]);
                             DB::connection('mysql_2')->table('attendance_app')->updateOrInsert([
                                 'member_id' => $x['member_id'],
@@ -428,7 +428,7 @@ class AttendanceController extends Controller
                                 'long'=>$x['long'],
                                 'member_id'=>$x['member_id'],
                                 'member_code'=>$x['member_code'],
-                                'status'=>$x['bulk_type']==1?1:0,
+                                'status'=>0,
                                 'punch_place'=>'',
                                 'atten_type'=>$atten_type,
                                 'member_type'=>$member_type,
