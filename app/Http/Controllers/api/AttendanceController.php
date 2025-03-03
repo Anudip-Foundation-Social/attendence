@@ -645,4 +645,41 @@ class AttendanceController extends Controller
         return Response(['data' => $x],200);
 
     }
+
+    public function fetchAllDetailsForTrainer($username)
+    {
+       try{
+
+
+
+        $centers= DB::connection('mysql_2')->table('users as u')
+                    ->leftJoin('users_roles as ur', 'u.id', '=', 'ur.user_id')
+                    ->leftJoin('users as u', 'u.id', '=', 'ur.user_id')
+                    ->leftJoin('centers as c', 'ur.center_id', '=', 'c.id')
+                    ->where('u.user_id', strtoupper($username))
+                    ->where('ur.role_id', 7)
+                    ->where('ur.status', 1)
+                    ->where('c.status', 1)
+                    ->get(['c.id as center_id','c.name as center_name','c.short_code as center_code']);
+        $center_ids = $centers->pluck('center_id')->toArray();
+        $batches= DB::connection('mysql_2')->table('batches')
+                    ->whereIn('center_id', $center_ids)
+                    ->where('status', 'running')
+                    ->get(['id as batch_id','batch_code','center_id']);
+        $batch_ids = $batches->pluck('batch_id')->toArray();
+
+        $members= DB::connection('mysql_2')->table('enrollments as e')
+                  ->leftJoin('members as m', 'e.member_id', '=', 'm.id')
+                  ->whereIn('e.batch_id', $batch_ids)
+                  ->where('e.status', 'enrolled')
+                  ->get(['m.first_name as first_name','m.last_name as last_name','m.member_code as member_code','m.id as member_id','e.batch_id as batch_id']);
+
+         return Response(['centers' => $centers,'batches' => $batches,'members' => $members],200);
+       return Response(['center_details' => $details_from_cmis],200);            
+
+       }catch(\Exception $e){
+        DB::rollback();
+        return $this->sendError($e->getMessage());
+      }
+    }
 }
