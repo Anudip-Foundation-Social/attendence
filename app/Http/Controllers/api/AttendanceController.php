@@ -368,7 +368,7 @@ class AttendanceController extends Controller
                             ],[
                                 'user_id_mob_app' => $x['user_id'],
                                 'atten_date' => $x['attend_date'],
-                                'punch_time'=>$x['punch_in'],
+                                'punch_time'=>$x['punch_out'],
                                 'lat'=>$x['lat'],
                                 'long'=>$x['long'],
                                 'member_id'=>$x['member_id'],
@@ -423,7 +423,7 @@ class AttendanceController extends Controller
                             ],[
                                 'user_id_mob_app' => $x['user_id'],
                                 'atten_date' => $x['attend_date'],
-                                'punch_time'=>$x['punch_in'],
+                                'punch_time'=>$x['punch_out'],
                                 'lat'=>$x['lat'],
                                 'long'=>$x['long'],
                                 'member_id'=>$x['member_id'],
