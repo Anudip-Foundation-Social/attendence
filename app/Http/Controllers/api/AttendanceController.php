@@ -719,9 +719,9 @@ class AttendanceController extends Controller
                         // })->save($folderPath.'/'.$input['file']);
                         // unlink(public_path($file));
 
-                        $s3_path="attendance/".trim($request->attend_date)."/";
-                        $folderPath = "volume_blr1_01/".trim($request->attend_date)."/";
-                        $base64Image = explode(";base64,", $request->image);
+                        $s3_path="attendance/".trim($x['attend_date'])."/";
+                        $folderPath = "volume_blr1_01/".trim($x['attend_date'])."/";
+                        $base64Image = explode(";base64,", $x-['image']);
                         $explodeImage = explode("image/", $base64Image[0]);
                         $imageType = $explodeImage[1];
                         $image_base64 = base64_decode($base64Image[1]);
@@ -733,7 +733,7 @@ class AttendanceController extends Controller
                         //dd('end');
                         $path = 'https://attendanceapi.anudip.org/'.$file;//need some changes
                         $filename = basename($path);
-                        $input['file'] = trim($request->batch_code)."_".$request->attend_date."_".time().'.jpg';
+                        $input['file'] = trim($request->batch_code)."_".$x-['attend_date']."_".time().'.jpg';
 
                         $imgFile = Image::make($path)->resize(200, 200, function ($constraint) {
                             $constraint->aspectRatio();
