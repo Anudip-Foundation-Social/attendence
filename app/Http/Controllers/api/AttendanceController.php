@@ -816,7 +816,7 @@ class AttendanceController extends Controller
 
                     }else{
                         $arr=[];
-                        dd('jj');
+                        //dd('jj');
                         foreach($student_list as $member_id){
                             $user_id=DB::table('users')->where('member_id', $member_id)->value('id');
                             $details = Attendance::where('atten_date', $x['attend_date'])->where('user_id', $user_id)->get();
