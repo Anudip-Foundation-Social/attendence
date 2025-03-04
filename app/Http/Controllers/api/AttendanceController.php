@@ -689,15 +689,15 @@ class AttendanceController extends Controller
        // DB::beginTransaction();
         try { 
            // dd($request->all());
-            foreach($request->all() as $a){
+            foreach($request->all() as $x){
                //dd(json_decode($a['studentList'], true));
-                    $student_list=json_decode($a['studentList'], true);
+                    $student_list=json_decode($x['studentList'], true);
             
                     date_default_timezone_set('Asia/Kolkata');
                     $time=date('H:i:s');
                     $attn_type='present';
                     $member_type='student';
-                    if($a['image']!=''){
+                    if($x['image']!=''){
                         // $folderPath = "volume_blr1_01/".trim($request->attend_date)."/";
                         // $base64Image = explode(";base64,", $request->image);
                         // $explodeImage = explode("image/", $base64Image[0]);
@@ -758,7 +758,7 @@ class AttendanceController extends Controller
                         $input['file']='NA'; 
                     }  
                     //$input['file']='NA';
-                    $trainer_id=DB::connection('mysql_2')->table('users')->where('user_id', $a['user_id'])->value('id');
+                    $trainer_id=DB::connection('mysql_2')->table('users')->where('user_id', $x['user_id'])->value('id');
                     
                     if($x['type']=='in'){
 
