@@ -690,7 +690,7 @@ class AttendanceController extends Controller
         try { 
            // dd($request->all());
             foreach($request->all() as $a){
-               dd($a['studentList']);
+               dd(json_decode($a['studentList'], true));
             
                     date_default_timezone_set('Asia/Kolkata');
                     $time=date('H:i:s');
