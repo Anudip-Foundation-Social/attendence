@@ -789,6 +789,7 @@ class AttendanceController extends Controller
                             
 
                             $datas=User::where('id',$user_id)->get(['member_code','member_id']);
+
                                 $postParameter = ['user_id' => $user_id,'atten_date' => $x['attend_date'],'punch_in'=>$time,'lat'=>$x['lat'],'long'=>$x['long'],'member_id'=>$datas[0]->member_id,'member_code'=>$datas[0]->member_code,'status'=>2,'bulk_type'=>1,'transfer_status'=>1,'atten_type'=>$attn_type,'member_type'=>$member_type,'punch_in_place'=>'demo','reason'=>$x['reason'],'center_id'=>$x['center_id'],'photo'=>$input['file'],'batch_id'=>$x['batch_id'],'batch_code'=>$x['batch_code'],'created_by'=>$trainer_id];
 
                                 $curlHandle = curl_init('https://cmis4api.anudip.org/public/api/insertFromAttenApp');
@@ -815,6 +816,7 @@ class AttendanceController extends Controller
 
                     }else{
                         $arr=[];
+                        dd('jj');
                         foreach($student_list as $member_id){
                             $user_id=DB::table('users')->where('member_id', $member_id)->value('id');
                             $details = Attendance::where('atten_date', $x['attend_date'])->where('user_id', $user_id)->get();
