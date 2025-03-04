@@ -682,4 +682,177 @@ class AttendanceController extends Controller
         //return $this->sendError($e->getMessage());
       }
     }
+
+    public function offlineSyncBulkPunchInOutAttendance(Request $request)
+    {
+        
+       // DB::beginTransaction();
+        try { 
+            dd($request->all());
+            date_default_timezone_set('Asia/Kolkata');
+            $time=date('H:i:s');
+            // if($request->attend_date<date('Y-m-d')){
+            //     $attn_type='past';
+            // }else{
+            //     $attn_type='present';
+            // }
+            $attn_type='present';
+            $member_type='student';
+            if($request->image!=''){
+                // $folderPath = "volume_blr1_01/".trim($request->attend_date)."/";
+                // $base64Image = explode(";base64,", $request->image);
+                // $explodeImage = explode("image/", $base64Image[0]);
+                // $imageType = $explodeImage[1];
+                // $image_base64 = base64_decode($base64Image[1]);
+                // $file = $folderPath . uniqid() . '.'.$imageType;
+                // if (!file_exists($folderPath)){
+                // mkdir($folderPath);
+                // }
+                // file_put_contents($file, $image_base64);
+                // //dd('end');
+                // $path = 'https://attendanceapi.anudip.org/'.$file;//need some changes
+                // $filename = basename($path);
+                // $input['file'] = trim($request->batch_code)."_".$request->attend_date."_".time().'.jpg';
+                // $imgFile=Image::make($path)->save(public_path($folderPath.$filename));
+
+                // $imgFile->resize(200, 200, function ($constraint) {
+                //     $constraint->aspectRatio();
+                // })->save($folderPath.'/'.$input['file']);
+                // unlink(public_path($file));
+
+                $s3_path="attendance/".trim($request->attend_date)."/";
+                $folderPath = "volume_blr1_01/".trim($request->attend_date)."/";
+                $base64Image = explode(";base64,", $request->image);
+                $explodeImage = explode("image/", $base64Image[0]);
+                $imageType = $explodeImage[1];
+                $image_base64 = base64_decode($base64Image[1]);
+                $file = $folderPath . uniqid() . '.'.$imageType;
+                if (!file_exists($folderPath)){
+                mkdir($folderPath);
+                }
+                file_put_contents($file, $image_base64);
+                //dd('end');
+                $path = 'https://attendanceapi.anudip.org/'.$file;//need some changes
+                $filename = basename($path);
+                $input['file'] = trim($request->batch_code)."_".$request->attend_date."_".time().'.jpg';
+
+                $imgFile = Image::make($path)->resize(200, 200, function ($constraint) {
+                    $constraint->aspectRatio();
+                });
+                
+                // Save the resized image temporarily in a local folder (if needed)
+                $tempPath = public_path($folderPath . $input['file']);
+                $imgFile->save($tempPath);
+                
+                // Upload the resized image to S3
+                Storage::disk('s3_1')->put($s3_path.$input['file'], file_get_contents($tempPath), [
+                    'ContentType' => mime_content_type($tempPath),
+                ]);
+
+                
+                
+                // Optionally, remove the local temporary file
+                unlink($tempPath);
+                unlink($file);
+                
+            }else{
+                $input['file']='NA'; 
+            }  
+            //$input['file']='NA';
+            $trainer_id=DB::connection('mysql_2')->table('users')->where('user_id', $request->user_id)->value('id');
+            
+            if($request->type=='in'){
+
+                
+                foreach($request->studentList as $member_id){
+
+                    $members=DB::connection('mysql_2')->table('members')->where('id',$member_id)->get(['member_code','first_name','last_name','email_id','mobile_no']);
+
+                    DB::table('users')->updateOrInsert([
+                        'member_id' => $member_id,
+                    ],[
+                        'name' => $members[0]->first_name." ".$members[0]->last_name,
+                        'username' => $members[0]->member_code,
+                        'email' => $members[0]->email_id,
+                        'mobile_no'=>$members[0]->mobile_no,
+                        'password'=>Hash::make('1234567'),
+                        'member_id'=>$member_id,
+                        'member_code'=>$members[0]->member_code,
+                        'batch_id'=>$request->batch_id,
+                        'batch_code'=>$request->batch_code,
+                        'center_id'=>$request->center_id,
+                        'center_code'=>$request->center_code,
+                        'status'=>1,
+                        'role_name'=>'student'
+                    ]);
+                    $user_id=DB::table('users')->where('member_id', $member_id)->value('id');
+                    
+
+                    $datas=User::where('id',$user_id)->get(['member_code','member_id']);
+                        $postParameter = ['user_id' => $user_id,'atten_date' => $request->attend_date,'punch_in'=>$time,'lat'=>$request->lat,'long'=>$request->long,'member_id'=>$datas[0]->member_id,'member_code'=>$datas[0]->member_code,'status'=>2,'bulk_type'=>1,'transfer_status'=>1,'atten_type'=>$attn_type,'member_type'=>$member_type,'punch_in_place'=>$request->location,'reason'=>$request->reason,'center_id'=>$request->center_id,'photo'=>$input['file'],'batch_id'=>$request->batch_id,'batch_code'=>$request->batch_code,'created_by'=>$trainer_id];
+
+                        $curlHandle = curl_init('https://cmis4api.anudip.org/public/api/insertFromAttenApp');
+                        curl_setopt($curlHandle, CURLOPT_POSTFIELDS, $postParameter);
+                        curl_setopt($curlHandle, CURLOPT_RETURNTRANSFER, true);
+                        $curlResponse = curl_exec($curlHandle);
+                        //dd($curlResponse);
+                        curl_close($curlHandle);
+
+                        if($curlResponse === false) {
+                            return Response(['message' => 'server issue','status'=>1],200);
+                        } 
+
+                        $lastId=Attendance::create($postParameter)->id;
+                        Photo::create(['user_id' => $user_id,'attendance_id'=>$lastId,'punch_type'=>'I','photo_name'=>$input['file'],'lat'=>$request->lat,'long'=>$request->long,'place'=>$request->location,'punch_time'=>$time,'punch_date'=>$request->attend_date,'member_code'=>trim($datas[0]->member_code)]);
+                        
+                        DB::commit();
+                }   
+                
+                
+                $x=['punch_in'=>$time,'date' => $request->attend_date];
+
+                return Response(['message' => 'inserted successfully','status'=>1,'data'=>$x],200);
+
+            }else{
+                $arr=[];
+                foreach($request->studentList as $member_id){
+                    $user_id=DB::table('users')->where('member_id', $member_id)->value('id');
+                    $details = Attendance::where('atten_date', $request->attend_date)->where('user_id', $user_id)->get();
+                    if(sizeof($details)>0){
+                        $datas=User::where('id',$user_id)->get(['member_code','member_id']);
+                        $postParameter = ['user_id' => $user_id,'atten_date' => $request->attend_date,'punch_in'=>$time,'lat'=>$request->lat,'long'=>$request->long,'member_id'=>$datas[0]->member_id,'member_code'=>$datas[0]->member_code,'status'=>2,'bulk_type'=>1,'transfer_status'=>1,'atten_type'=>$attn_type,'member_type'=>$member_type,'punch_in_place'=>$request->location,'reason'=>$request->reason,'center_id'=>$request->center_id,'photo'=>$input['file'],'batch_id'=>$request->batch_id,'batch_code'=>$request->batch_code,'created_by'=>$trainer_id];
+
+                        $curlHandle = curl_init('https://cmis4api.anudip.org/public/api/insertFromAttenApp');
+                        curl_setopt($curlHandle, CURLOPT_POSTFIELDS, $postParameter);
+                        curl_setopt($curlHandle, CURLOPT_RETURNTRANSFER, true);
+                        $curlResponse = curl_exec($curlHandle);
+                        //dd($curlResponse);
+                        curl_close($curlHandle);
+
+                        if($curlResponse === false) {
+                            return Response(['message' => 'server issue','status'=>1],200);
+                        } 
+
+                        Attendance::where('atten_date', $request->attend_date)->where('user_id', $user_id)->update(['punch_out'=>$time,'punch_out_lat'=>$request->lat,'punch_out_long'=>$request->long,'status'=>0,'punch_out_place'=>$request->location]);
+
+                        Photo::create(['user_id' => $user_id,'attendance_id'=>$details[0]->id,'punch_type'=>'O','photo_name'=>$input['file'],'lat'=>$request->lat,'long'=>$request->long,'place'=>$request->location,'punch_time'=>$time,'punch_date'=>$request->attend_date,'member_code'=>trim($datas[0]->member_code)]);
+
+                        
+                        DB::commit();
+                    } else{
+                        $members=DB::connection('mysql_2')->table('members')->where('id',$member_id)->get(['member_code','first_name','last_name']);
+                        array_push($arr,$members);
+                    }   
+                }    
+                
+                return Response(['message' => 'updated successfully','status'=>1,'members'=>$arr],200);
+
+            }
+            
+
+        } catch (Exception $e) { 
+            DB::rollback();
+            return $this->sendError($e->getMessage());
+        }
+    }
 }
