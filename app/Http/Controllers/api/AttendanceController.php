@@ -11,6 +11,7 @@ use Image;
 use App\Models\User;
 use App\Models\Photo;
 use Excel;
+use Illuminate\Support\Facades\Hash;
 use Storage;
 class AttendanceController extends Controller
 {
