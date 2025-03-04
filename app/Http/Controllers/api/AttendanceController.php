@@ -820,7 +820,7 @@ class AttendanceController extends Controller
                             $details = Attendance::where('atten_date', $x['attend_date'])->where('user_id', $user_id)->get();
                             if(sizeof($details)>0){
                                 $datas=User::where('id',$user_id)->get(['member_code','member_id']);
-                                $postParameter = ['user_id' => $user_id,'atten_date' => $x['attend_date'],'punch_in'=>$time,'lat'=>$x['lat'],'long'=>$x['long'],'member_id'=>$datas[0]->member_id,'member_code'=>$datas[0]->member_code,'status'=>2,'bulk_type'=>1,'transfer_status'=>1,'atten_type'=>$attn_type,'member_type'=>$member_type,'punch_in_place'=>$x['location'],'reason'=>$x['reason'],'center_id'=>$x['center_id'],'photo'=>$input['file'],'batch_id'=>$x['batch_id'],'batch_code'=>$x['batch_code'],'created_by'=>$trainer_id];
+                                $postParameter = ['user_id' => $user_id,'atten_date' => $x['attend_date'],'punch_in'=>$time,'lat'=>$x['lat'],'long'=>$x['long'],'member_id'=>$datas[0]->member_id,'member_code'=>$datas[0]->member_code,'status'=>2,'bulk_type'=>1,'transfer_status'=>1,'atten_type'=>$attn_type,'member_type'=>$member_type,'punch_in_place'=>'','reason'=>$x['reason'],'center_id'=>$x['center_id'],'photo'=>$input['file'],'batch_id'=>$x['batch_id'],'batch_code'=>$x['batch_code'],'created_by'=>$trainer_id];
 
                                 $curlHandle = curl_init('https://cmis4api.anudip.org/public/api/insertFromAttenApp');
                                 curl_setopt($curlHandle, CURLOPT_POSTFIELDS, $postParameter);
@@ -833,9 +833,9 @@ class AttendanceController extends Controller
                                     return Response(['message' => 'server issue','status'=>1],200);
                                 } 
 
-                                Attendance::where('atten_date', $request->attend_date)->where('user_id', $user_id)->update(['punch_out'=>$time,'punch_out_lat'=>$request->lat,'punch_out_long'=>$x['long'],'status'=>0,'punch_out_place'=>$x['location']]);
+                                Attendance::where('atten_date', $request->attend_date)->where('user_id', $user_id)->update(['punch_out'=>$time,'punch_out_lat'=>$request->lat,'punch_out_long'=>$x['long'],'status'=>0,'punch_out_place'=>'']);
 
-                                Photo::create(['user_id' => $user_id,'attendance_id'=>$details[0]->id,'punch_type'=>'O','photo_name'=>$input['file'],'lat'=>$x['lat'],'long'=>$x['long'],'place'=>$x['location'],'punch_time'=>$time,'punch_date'=>$x['attend_date'],'member_code'=>trim($datas[0]->member_code)]);
+                                Photo::create(['user_id' => $user_id,'attendance_id'=>$details[0]->id,'punch_type'=>'O','photo_name'=>$input['file'],'lat'=>$x['lat'],'long'=>$x['long'],'place'=>'','punch_time'=>$time,'punch_date'=>$x['attend_date'],'member_code'=>trim($datas[0]->member_code)]);
 
                                 
                                 DB::commit();
