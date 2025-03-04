@@ -695,7 +695,7 @@ class AttendanceController extends Controller
                     $student_list=json_decode($x['studentList'], true);
             
                     date_default_timezone_set('Asia/Kolkata');
-                    $time=date('H:i:s');
+                    $time=$x['punch_time'];
                     $attn_type='present';
                     $member_type='student';
                     if($x['image']!=''){
