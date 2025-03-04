@@ -688,7 +688,7 @@ class AttendanceController extends Controller
         
        // DB::beginTransaction();
         try { 
-           
+            dd($request->all());
             foreach($request->all() as $a){
                 dd($a['id']);
             }
