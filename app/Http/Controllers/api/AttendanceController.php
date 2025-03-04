@@ -688,7 +688,10 @@ class AttendanceController extends Controller
         
        // DB::beginTransaction();
         try { 
-            dd($request->all());
+           
+            foreach($request->all() as $a){
+                dd($a['id']);
+            }
             date_default_timezone_set('Asia/Kolkata');
             $time=date('H:i:s');
             // if($request->attend_date<date('Y-m-d')){
