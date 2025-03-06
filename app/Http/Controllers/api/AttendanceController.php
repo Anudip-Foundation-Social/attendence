@@ -449,7 +449,7 @@ class AttendanceController extends Controller
                     //$x=['punch_in'=>$time,'date' => $x['attend_date']];
                     DB::commit();
             }    
-            return Response(['message' => 'inserted successfully','status'=>1,'data'=>$x],200);
+            return Response(['message' => 'inserted successfully','status'=>1],200);
 
         } catch (Exception $e) { 
             DB::rollback();
@@ -852,6 +852,7 @@ class AttendanceController extends Controller
 
                     }
             }
+            return Response(['message' => 'inserted successfully','status'=>1],200);
             
 
         } catch (Exception $e) { 
