@@ -766,7 +766,7 @@ class AttendanceController extends Controller
                         
                         foreach($student_list as $member_id){
 
-                            $members=DB::connection('mysql_2')->table('members')->where('id',$member_id)->get(['member_code','first_name','last_name','email_id','mobile_no']);
+                            $members=DB::connection('mysql_2')->table('members')->where('id',$member_id)->get(['member_code','first_name','last_name','email_id','mobile_no','gender']);
 
                             DB::table('users')->updateOrInsert([
                                 'member_id' => $member_id,
@@ -783,7 +783,8 @@ class AttendanceController extends Controller
                                 'center_id'=>$x['center_id'],
                                 'center_code'=>$x['center_code'],
                                 'status'=>1,
-                                'role_name'=>'student'
+                                'role_name'=>'student',
+                                'gender'=>$members[0]->gender
                             ]);
                             $user_id=DB::table('users')->where('member_id', $member_id)->value('id');
                             

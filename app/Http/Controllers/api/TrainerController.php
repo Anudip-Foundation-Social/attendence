@@ -365,7 +365,7 @@ class TrainerController extends Controller
                 
                 foreach($request->studentList as $member_id){
 
-                    $members=DB::connection('mysql_2')->table('members')->where('id',$member_id)->get(['member_code','first_name','last_name','email_id','mobile_no']);
+                    $members=DB::connection('mysql_2')->table('members')->where('id',$member_id)->get(['member_code','first_name','last_name','email_id','mobile_no','gender']);
 
                     DB::table('users')->updateOrInsert([
                         'member_id' => $member_id,
@@ -382,7 +382,8 @@ class TrainerController extends Controller
                         'center_id'=>$request->center_id,
                         'center_code'=>$request->center_code,
                         'status'=>1,
-                        'role_name'=>'student'
+                        'role_name'=>'student',
+                        'gender'=>$members[0]->gender
                     ]);
                     $user_id=DB::table('users')->where('member_id', $member_id)->value('id');
                     
