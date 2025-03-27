@@ -362,33 +362,36 @@ class AttendanceController extends Controller
                         //dd($details1);
                         if(sizeof($details1)>0){
 
-                            Attendance::where('atten_date', $x['attend_date'])->where('user_id', $details1[0]->user_id)->update(['punch_in'=>$x['punch_in'],'punch_out'=>$x['punch_out'],'punch_out_lat'=>$x['lat'],'punch_out_long'=>$x['long'],'status'=>0,'punch_out_place'=>'','atten_type'=>$attn_type,'reason'=>$x['reason']]);
+                            if($details1[0]->status!=1 && $details1[0]->status!=3){
 
-                            Photo::create(['user_id' => $x['user_id'],'attendance_id'=>$details1[0]->id,'punch_type'=>'O','photo_name'=>$input['file'],'lat'=>$x['lat'],'long'=>$x['long'],'place'=>'','punch_time'=>$x['punch_out'],'punch_date'=>$x['attend_date'],'member_code'=>trim($x['member_code'])]);
+                                Attendance::where('atten_date', $x['attend_date'])->where('user_id', $details1[0]->user_id)->update(['punch_in'=>$x['punch_in'],'punch_out'=>$x['punch_out'],'punch_out_lat'=>$x['lat'],'punch_out_long'=>$x['long'],'status'=>0,'punch_out_place'=>'','atten_type'=>$attn_type,'reason'=>$x['reason']]);
 
-                            DB::connection('mysql_2')->table('attendance_app')->updateOrInsert([
-                                'member_id' => $x['member_id'],
-                                'atten_date' => $x['attend_date'],
-                                'punch_type'=>"O",
-                            ],[
-                                'user_id_mob_app' => $x['user_id'],
-                                'atten_date' => $x['attend_date'],
-                                'punch_time'=>$x['punch_out'],
-                                'lat'=>$x['lat'],
-                                'long'=>$x['long'],
-                                'member_id'=>$x['member_id'],
-                                'member_code'=>$x['member_code'],
-                                'status'=>0,
-                                'punch_place'=>'',
-                                'atten_type'=>$attn_type,
-                                'member_type'=>$member_type,
-                                'reason'=>$x['reason'],
-                                'center_id'=>$x['center_id'],
-                                'punch_type'=>"O",
-                                'photo'=>$input['file'],
-                                'batch_code'=>$x['batch_code'],
-                                'update_attn_status'=>0,
-                            ]);
+                                Photo::create(['user_id' => $x['user_id'],'attendance_id'=>$details1[0]->id,'punch_type'=>'O','photo_name'=>$input['file'],'lat'=>$x['lat'],'long'=>$x['long'],'place'=>'','punch_time'=>$x['punch_out'],'punch_date'=>$x['attend_date'],'member_code'=>trim($x['member_code'])]);
+
+                                DB::connection('mysql_2')->table('attendance_app')->updateOrInsert([
+                                    'member_id' => $x['member_id'],
+                                    'atten_date' => $x['attend_date'],
+                                    'punch_type'=>"O",
+                                ],[
+                                    'user_id_mob_app' => $x['user_id'],
+                                    'atten_date' => $x['attend_date'],
+                                    'punch_time'=>$x['punch_out'],
+                                    'lat'=>$x['lat'],
+                                    'long'=>$x['long'],
+                                    'member_id'=>$x['member_id'],
+                                    'member_code'=>$x['member_code'],
+                                    'status'=>0,
+                                    'punch_place'=>'',
+                                    'atten_type'=>$attn_type,
+                                    'member_type'=>$member_type,
+                                    'reason'=>$x['reason'],
+                                    'center_id'=>$x['center_id'],
+                                    'punch_type'=>"O",
+                                    'photo'=>$input['file'],
+                                    'batch_code'=>$x['batch_code'],
+                                    'update_attn_status'=>0,
+                                ]);
+                            }    
 
                         }else{
                             Attendance::where('atten_date', $x['attend_date'])->where('user_id', $x['user_id'])->delete();
