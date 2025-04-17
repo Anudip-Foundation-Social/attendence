@@ -566,6 +566,8 @@ class AttendanceController extends Controller
                     'batch_code'=>$r['batch_code'],
                     'center_id' => $r['center_id'],
                     'center_code'=>$r['center_code'],
+                    'created_at'=>now(),
+                    'updated_at'=>now(),
                     ]);
             }   
             //DB::commit(); 
@@ -620,7 +622,7 @@ class AttendanceController extends Controller
            $result_array = $results;
             foreach($result_array as $r){
                 
-                dd($r);
+                //dd($r);
                 $student_id = User::create([
                     'name' => $r['first_name']." ".$r['last_name'],
                     'username' =>$r['member_code'],
@@ -634,6 +636,8 @@ class AttendanceController extends Controller
                     'batch_code'=>$r['batch_code'],
                     'center_id' => $r['center_id'],
                     'center_code'=>$r['center_code'],
+                    'created_at'=>now(),
+                    'updated_at'=>now(),
                     ]);
             }   
             //DB::commit(); 
