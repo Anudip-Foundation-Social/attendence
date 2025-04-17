@@ -51,10 +51,23 @@ class TrainerController extends Controller
     {
        try{
 
-        $batches= DB::connection('mysql_2')->table('batches')
-                    ->where('center_id', $center_id)
-                    ->where('status', 'running')
-                    ->get(['id as batch_id','batch_code']);
+        // $batches= DB::connection('mysql_2')->table('batches')
+        //             ->where('center_id', $center_id)
+        //             ->where('status', 'running')
+        //             ->get(['id as batch_id','batch_code']);
+
+        $oneMonthAgo = date('Y-m-d', strtotime('-1 month'));
+
+        $batches = DB::connection('mysql_2')->table('batches')
+            ->where('center_id', $center_id)
+            ->where(function($query) use ($oneMonthAgo) {
+                $query->where('status', 'running')
+                    ->orWhere(function($q) use ($oneMonthAgo) {
+                        $q->where('status', 'complete')
+                            ->whereDate('actual_end_date', '>=', $oneMonthAgo);
+                    });
+            })
+        ->get(['id as batch_id', 'batch_code']);
          return Response(['batches' => $batches],200);            
 
        }catch(\Exception $e){
