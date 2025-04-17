@@ -766,8 +766,9 @@ class AttendanceController extends Controller
                         $input['file']='NA'; 
                     }  
                     //$input['file']='NA';
-                    $trainer_id=DB::connection('mysql_2')->table('users')->where('user_id', $x['user_id'])->value('id');
-                    
+                    // $trainer_id=DB::connection('mysql_2')->table('users')->where('user_id', $x['user_id'])->value('id');
+                    $trainer_username=DB::table('users')->where('id', $x['user_id'])->value('username');
+                    $trainer_id=DB::connection('mysql_2')->table('users')->where('user_id', $trainer_username)->value('id');
                     if($x['type']=='in'){
 
                         
