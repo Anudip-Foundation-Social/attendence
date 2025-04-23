@@ -384,7 +384,11 @@ class AttendanceController extends Controller
                         //dd($details1);
                         if(sizeof($details1)>0){
 
-                            if($details1[0]->status!=1 && $details1[0]->status!=3){
+                            //if($details1[0]->status!=1 && $details1[0]->status!=3){
+                            if(($sts[0]->status != 1 && $sts[0]->status != 3) ||
+                            ($sts[0]->status == 1 && $sts[0]->punch_out == null)){
+
+                                
 
                                 Attendance::where('atten_date', $x['attend_date'])->where('user_id', $details1[0]->user_id)->update(['punch_in'=>$x['punch_in'],'punch_out'=>$x['punch_out'],'punch_out_lat'=>$x['lat'],'punch_out_long'=>$x['long'],'status'=>0,'punch_out_place'=>'','atten_type'=>$attn_type,'reason'=>$x['reason']]);
 
