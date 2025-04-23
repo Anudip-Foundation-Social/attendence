@@ -185,8 +185,8 @@ class AttendanceController extends Controller
             $postParameter = ['user_id' => $request->user_id,'atten_date' => $request->attend_date,'punch_in'=>$time,'lat'=>$request->lat,'long'=>$request->long,'member_id'=>$request->member_id,'member_code'=>$request->member_code,'status'=>2,'transfer_status'=>1,'atten_type'=>$attn_type,'member_type'=>$member_type,'punch_in_place'=>$request->location,'reason'=>$request->reason,'center_id'=>$request->center_id,'photo'=>$input['file'],'batch_id'=>$request->batch_id,'batch_code'=>$request->batch_code];
             if(sizeof($details)>0){
                 //dd($details[0]->id);
-                $sts=Attendance::where('atten_date', $request->attend_date)->where('user_id', $details[0]->user_id)->value('status');
-                if($sts!=1 && $sts!=3){
+                $sts=Attendance::where('atten_date', $request->attend_date)->where('user_id', $details[0]->user_id)->get(['status','punch_out']);
+                if($sts[0]->status!=1 && $sts[0]->status!=3 && $sts[0]->punch_out!=null){
                     $curlHandle = curl_init('https://cmis3api.anudip.org/api/insertFromAttenApp');
                     curl_setopt($curlHandle, CURLOPT_POSTFIELDS, $postParameter);
                     curl_setopt($curlHandle, CURLOPT_RETURNTRANSFER, true);
