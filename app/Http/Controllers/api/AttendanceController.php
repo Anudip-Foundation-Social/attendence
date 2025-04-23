@@ -186,6 +186,7 @@ class AttendanceController extends Controller
             if(sizeof($details)>0){
                 //dd($details[0]->id);
                 $sts=Attendance::where('atten_date', $request->attend_date)->where('user_id', $details[0]->user_id)->get(['status','punch_out']);
+                dd('fg');
                 if($sts[0]->status!=1 && $sts[0]->status!=3 && $sts[0]->punch_out!=null){
                     $curlHandle = curl_init('https://cmis3api.anudip.org/api/insertFromAttenApp');
                     curl_setopt($curlHandle, CURLOPT_POSTFIELDS, $postParameter);
