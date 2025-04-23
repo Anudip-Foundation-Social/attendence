@@ -187,7 +187,12 @@ class AttendanceController extends Controller
                 //dd($details[0]->id);
                 $sts=Attendance::where('atten_date', $request->attend_date)->where('user_id', $details[0]->user_id)->get(['status','punch_out']);
                 //dd($sts);
-                if($sts[0]->status!=1 && $sts[0]->status!=3 && $sts[0]->punch_out==null){
+                if (
+                    ($sts[0]->status != 1 && $sts[0]->status != 3) ||
+                    ($sts[0]->status == 1 && $sts[0]->punch_out == null)
+                ) { 
+
+                    
                     $curlHandle = curl_init('https://cmis3api.anudip.org/api/insertFromAttenApp');
                     curl_setopt($curlHandle, CURLOPT_POSTFIELDS, $postParameter);
                     curl_setopt($curlHandle, CURLOPT_RETURNTRANSFER, true);
@@ -199,7 +204,23 @@ class AttendanceController extends Controller
                     Photo::create(['user_id' => $request->user_id,'attendance_id'=>$details[0]->id,'punch_type'=>'O','photo_name'=>$input['file'],'lat'=>$request->lat,'long'=>$request->long,'place'=>$request->location,'punch_time'=>$time,'punch_date'=>$request->attend_date,'member_code'=>trim($request->member_code)]);
 
                     $x=['punch_out'=>$time,'date' => $request->attend_date,'punch_in'=>$details[0]->punch_in];
-                }    
+                } 
+                // if($sts[0]->status==1 && $sts[0]->punch_out==null){
+
+                //     $curlHandle = curl_init('https://cmis3api.anudip.org/api/insertFromAttenApp');
+                //     curl_setopt($curlHandle, CURLOPT_POSTFIELDS, $postParameter);
+                //     curl_setopt($curlHandle, CURLOPT_RETURNTRANSFER, true);
+                //     $curlResponse = curl_exec($curlHandle);
+                //     //dd($curlResponse);
+                //     curl_close($curlHandle);
+                //     Attendance::where('atten_date', $request->attend_date)->where('user_id', $details[0]->user_id)->update(['punch_out'=>$time,'punch_out_lat'=>$request->lat,'punch_out_long'=>$request->long,'status'=>0,'punch_out_place'=>$request->location]);
+
+                //     Photo::create(['user_id' => $request->user_id,'attendance_id'=>$details[0]->id,'punch_type'=>'O','photo_name'=>$input['file'],'lat'=>$request->lat,'long'=>$request->long,'place'=>$request->location,'punch_time'=>$time,'punch_date'=>$request->attend_date,'member_code'=>trim($request->member_code)]);
+
+                //     $x=['punch_out'=>$time,'date' => $request->attend_date,'punch_in'=>$details[0]->punch_in];
+
+                // }  
+
                 DB::commit();
                 $x=['punch_out'=>$time,'date' => $request->attend_date,'punch_in'=>$details[0]->punch_in];
                     return Response(['message' => 'updated successfully','status'=>1,'data'=>$x],200);
