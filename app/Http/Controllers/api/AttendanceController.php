@@ -849,7 +849,7 @@ class AttendanceController extends Controller
                                     return Response(['message' => 'server issue','status'=>1],200);
                                 } 
 
-                                Attendance::where('atten_date', $x['attend_date'])->where('user_id', $user_id)->update(['punch_out'=>$time,'punch_out_lat'=>$x['lat'],'punch_out_long'=>$x['long'],'status'=>0,'punch_out_place'=>'']);
+                                Attendance::where('atten_date', $x['attend_date'])->where('user_id', $user_id)->where('created_by', $trainer_id)->update(['punch_out'=>$time,'punch_out_lat'=>$x['lat'],'punch_out_long'=>$x['long'],'status'=>0,'punch_out_place'=>'']);
                                 //dd($user_id,$x['attend_date']);
                                 Photo::create(['user_id' => $user_id,'attendance_id'=>$details[0]->id,'punch_type'=>'O','photo_name'=>$input['file'],'lat'=>$x['lat'],'long'=>$x['long'],'place'=>'','punch_time'=>$time,'punch_date'=>$x['attend_date'],'member_code'=>trim($datas[0]->member_code)]);
 
