@@ -60,7 +60,7 @@ class TrainerController extends Controller
 
         $batches = DB::connection('mysql_2')->table('batches')
             ->where('center_id', $center_id)
-            ->where('batch_type','!=','Biometric Available')
+            ->where('batch_type','=','Biometric Not Available')
             ->where(function($query) use ($oneMonthAgo) {
                 $query->where('status', 'running')
                     ->orWhere(function($q) use ($oneMonthAgo) {
