@@ -28,7 +28,8 @@ class Attendance extends Model
         'punch_out_long',
         'reason',
         'bulk_type',
-        'created_by'
+        'created_by',
+        'app_version'
     ];
     public function user()
     {

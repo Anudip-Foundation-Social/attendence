@@ -158,7 +158,7 @@ class TrainerController extends Controller
                 $input['file']='NA'; 
             }    
 
-            $postParameter = ['user_id' => $request->user_id,'atten_date' => $request->attend_date,'punch_in'=>$time,'lat'=>$request->lat,'long'=>$request->long,'member_id'=>$request->member_id,'member_code'=>$request->member_code,'status'=>2,'transfer_status'=>1,'bulk_type'=>0,'atten_type'=>$attn_type,'member_type'=>$member_type,'punch_in_place'=>$request->location,'reason'=>$request->reason,'center_id'=>$request->center_id,'photo'=>$input['file'],'batch_id'=>$request->batch_id,'batch_code'=>$request->batch_code,'created_by'=>0];
+            $postParameter = ['user_id' => $request->user_id,'atten_date' => $request->attend_date,'punch_in'=>$time,'lat'=>$request->lat,'long'=>$request->long,'member_id'=>$request->member_id,'member_code'=>$request->member_code,'status'=>2,'transfer_status'=>1,'bulk_type'=>0,'atten_type'=>$attn_type,'member_type'=>$member_type,'punch_in_place'=>$request->location,'reason'=>$request->reason,'center_id'=>$request->center_id,'photo'=>$input['file'],'batch_id'=>$request->batch_id,'batch_code'=>$request->batch_code,'created_by'=>0,'app_version'=>$request->app_version];
             if(sizeof($details)>0){
                 //dd($details[0]->id);
                 $curlHandle = curl_init('https://cmis4api.anudip.org/public/api/insertFromAttenApp');
@@ -410,7 +410,7 @@ class TrainerController extends Controller
                             
 
                             $datas=User::where('id',$user_id)->get(['member_code','member_id']);
-                            $postParameter = ['user_id' => $user_id,'atten_date' => $request->attend_date,'punch_in'=>$time,'lat'=>$request->lat,'long'=>$request->long,'member_id'=>$datas[0]->member_id,'member_code'=>$datas[0]->member_code,'status'=>2,'bulk_type'=>1,'transfer_status'=>1,'atten_type'=>$attn_type,'member_type'=>$member_type,'punch_in_place'=>$request->location,'reason'=>$request->reason,'center_id'=>$request->center_id,'photo'=>$input['file'],'batch_id'=>$request->batch_id,'batch_code'=>$request->batch_code,'created_by'=>$trainer_id];
+                            $postParameter = ['user_id' => $user_id,'atten_date' => $request->attend_date,'punch_in'=>$time,'lat'=>$request->lat,'long'=>$request->long,'member_id'=>$datas[0]->member_id,'member_code'=>$datas[0]->member_code,'status'=>2,'bulk_type'=>1,'transfer_status'=>1,'atten_type'=>$attn_type,'member_type'=>$member_type,'punch_in_place'=>$request->location,'reason'=>$request->reason,'center_id'=>$request->center_id,'photo'=>$input['file'],'batch_id'=>$request->batch_id,'batch_code'=>$request->batch_code,'created_by'=>$trainer_id,'app_version'=>$request->app_version];
 
                             $curlHandle = curl_init('https://cmis4api.anudip.org/public/api/insertFromAttenApp');
                             curl_setopt($curlHandle, CURLOPT_POSTFIELDS, $postParameter);
@@ -434,7 +434,7 @@ class TrainerController extends Controller
                         $details = Attendance::where('atten_date', $request->attend_date)->where('user_id', $user_id)->get();
                         if(sizeof($details)>0){
                             $datas=User::where('id',$user_id)->get(['member_code','member_id']);
-                            $postParameter = ['user_id' => $user_id,'atten_date' => $request->attend_date,'punch_in'=>$time,'lat'=>$request->lat,'long'=>$request->long,'member_id'=>$datas[0]->member_id,'member_code'=>$datas[0]->member_code,'status'=>2,'bulk_type'=>1,'transfer_status'=>1,'atten_type'=>$attn_type,'member_type'=>$member_type,'punch_in_place'=>$request->location,'reason'=>$request->reason,'center_id'=>$request->center_id,'photo'=>$input['file'],'batch_id'=>$request->batch_id,'batch_code'=>$request->batch_code,'created_by'=>$trainer_id];
+                            $postParameter = ['user_id' => $user_id,'atten_date' => $request->attend_date,'punch_in'=>$time,'lat'=>$request->lat,'long'=>$request->long,'member_id'=>$datas[0]->member_id,'member_code'=>$datas[0]->member_code,'status'=>2,'bulk_type'=>1,'transfer_status'=>1,'atten_type'=>$attn_type,'member_type'=>$member_type,'punch_in_place'=>$request->location,'reason'=>$request->reason,'center_id'=>$request->center_id,'photo'=>$input['file'],'batch_id'=>$request->batch_id,'batch_code'=>$request->batch_code,'created_by'=>$trainer_id,'app_version'=>$request->app_version];
 
                             $curlHandle = curl_init('https://cmis4api.anudip.org/public/api/insertFromAttenApp');
                             curl_setopt($curlHandle, CURLOPT_POSTFIELDS, $postParameter);
@@ -554,7 +554,7 @@ class TrainerController extends Controller
                 $input['file']='NA'; 
             }    
 
-            $postParameter = ['user_id' => $request->user_id,'atten_date' => $request->attend_date,'punch_in'=>$time,'lat'=>$request->lat,'long'=>$request->long,'member_id'=>$request->member_id,'member_code'=>$request->member_code,'status'=>2,'transfer_status'=>1,'atten_type'=>$attn_type,'member_type'=>$member_type,'punch_in_place'=>$request->location,'reason'=>$request->reason,'center_id'=>$request->center_id,'photo'=>$input['file'],'batch_id'=>$request->batch_id,'batch_code'=>$request->batch_code];
+            $postParameter = ['user_id' => $request->user_id,'atten_date' => $request->attend_date,'punch_in'=>$time,'lat'=>$request->lat,'long'=>$request->long,'member_id'=>$request->member_id,'member_code'=>$request->member_code,'status'=>2,'transfer_status'=>1,'atten_type'=>$attn_type,'member_type'=>$member_type,'punch_in_place'=>$request->location,'reason'=>$request->reason,'center_id'=>$request->center_id,'photo'=>$input['file'],'batch_id'=>$request->batch_id,'batch_code'=>$request->batch_code,'app_version'=>$request->app_version];
             if(sizeof($details)>0){
                 //dd($details[0]->id);
                 $curlHandle = curl_init('https://cmis4api.anudip.org/public/api/insertFromAttenApp');
