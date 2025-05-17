@@ -810,7 +810,7 @@ class AttendanceController extends Controller
                             $incount=Attendance::where('atten_date',$request->attend_date)->where('member_id',$member_id)->count();
                            // dd($incount);
                             if($incount==0){
-
+                                dd($member_id);
                                 $members=DB::connection('mysql_2')->table('members')->where('id',$member_id)->get(['member_code','first_name','last_name','email_id','mobile_no','gender']);
             
                                 DB::table('users')->updateOrInsert([
@@ -1000,7 +1000,7 @@ class AttendanceController extends Controller
                                         'attd_month'=>'All',
                                     )
                                 );
-                                dd('end');
+                                //dd('end');
             
                                 
                                 
