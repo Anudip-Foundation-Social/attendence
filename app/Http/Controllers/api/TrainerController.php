@@ -472,11 +472,11 @@ class TrainerController extends Controller
 
                     $details = Attendance::where('attend_date', $request->attend_date)->where('user_id', $user_id)->get();
 
-                    Photo::create(['user_id' => $user_id,'attendance_id'=>$details[0]->id,'punch_type'=>'O','photo_name'=>$input['file'],'lat'=>$request->lat,'long'=>$request->long,'place'=>$request->location,'punch_time'=>$time,'punch_date'=>$request->attend_date,'member_code'=>trim($datas[0]->member_code)]);
+                    Photo::create(['user_id' => $user_id,'attendance_id'=>$details[0]->id,'punch_type'=>'O','photo_name'=>$input['file'],'lat'=>$request->lat,'long'=>$request->long,'place'=>$request->location,'punch_time'=>$time,'punch_date'=>$request->attend_date,'member_code'=>trim($users[0]->member_code)]);
                     
                     $mob_id=DB::connection('mysql_2')->table('attendance_app')->insertGetId([
                         'user_id_mob_app' => $user_id,
-                        'atten_date' => $request->atten_date,
+                        'atten_date' => $request->attend_date,
                         'punch_time' => $time,
                         'lat' => $request->lat,
                         'long' => $request->long,
@@ -505,7 +505,7 @@ class TrainerController extends Controller
                             'member_type'=>'student',
                             'punch_type'=>"O",
                             'flag_value'=>1,
-                            'punch_time'=>$request->atten_date." ".$time,
+                            'punch_time'=>$request->attend_date." ".$time,
                             'onetime'=>1,
                             'created_at'=>now(),
                             'attd_month'=>'All',
