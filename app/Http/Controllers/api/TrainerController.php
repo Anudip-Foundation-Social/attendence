@@ -381,7 +381,7 @@ class TrainerController extends Controller
                     $users=DB::table('users')->where('member_id', $member_id)->get(['id','member_code']);
                     $user_id= $users[0]->id;
 
-                    $atten_type=$request->atten_date==date('Y-m-d')?'present':'past';
+                    $atten_type=$request->attend_date==date('Y-m-d')?'present':'past';
                     if(str_starts_with($users[0]->member_code, 'AF')){
                         $member_type='student';
                     }else{
@@ -392,7 +392,7 @@ class TrainerController extends Controller
 
                     $lastId=DB::table('attendances')->insertGetId([
                         'user_id'         => $user_id,
-                        'atten_date'      => $request->atten_date,
+                        'atten_date'      => $request->attend_date,
                         'punch_in'        => $time,
                         'lat'             => $request->lat,
                         'long'            => $request->long,
@@ -413,7 +413,7 @@ class TrainerController extends Controller
                     ]);
                     dd($lastId,[
                         'user_id'         => $user_id,
-                        'atten_date'      => $request->atten_date,
+                        'atten_date'      => $request->attend_date,
                         'punch_in'        => $time,
                         'lat'             => $request->lat,
                         'long'            => $request->long,
@@ -437,7 +437,7 @@ class TrainerController extends Controller
                     
                     $mob_id=DB::connection('mysql_2')->table('attendance_app')->insertGetId([
                         'user_id_mob_app' => $user_id,
-                        'atten_date' => $request->atten_date,
+                        'atten_date' => $request->attend_date,
                         'punch_time' => $time,
                         'lat' => $request->lat,
                         'long' => $request->long,
@@ -466,7 +466,7 @@ class TrainerController extends Controller
                             'member_type'=>'student',
                             'punch_type'=>"I",
                             'flag_value'=>1,
-                            'punch_time'=>$request->atten_date." ".$time,
+                            'punch_time'=>$request->attend_date." ".$time,
                             'onetime'=>1,
                             'created_at'=>now(),
                             'attd_month'=>'All',
