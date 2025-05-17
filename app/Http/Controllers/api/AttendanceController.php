@@ -984,7 +984,7 @@ class AttendanceController extends Controller
                                     ]);
                                     $mobile_id=$mob_id;
                                 }
-                                //dd($mobile_id);
+                                dd($mobile_id);
             
                                 $insertGetBatchId = DB::connection('mysql_2')->table('attendance_records')->insertGetId(
                                     array(
