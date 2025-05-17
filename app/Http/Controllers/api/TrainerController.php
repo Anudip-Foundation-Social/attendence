@@ -351,7 +351,7 @@ class TrainerController extends Controller
             foreach($request->studentList as $member_id){
 
                 $incount=Attendance::where('atten_date',$request->attend_date)->where('member_id',$member_id)->count();
-
+                 //dd()
                 if($incount==0){
 
                     $members=DB::connection('mysql_2')->table('members')->where('id',$member_id)->get(['member_code','first_name','last_name','email_id','mobile_no','gender']);
@@ -387,7 +387,7 @@ class TrainerController extends Controller
                         $member_type='staff';
                     }
 
-                    $postParameter = ['user_id' => $user_id,'atten_date' => $request->attend_date,'punch_in'=>$time,'lat'=>$request->lat,'long'=>$request->long,'member_id'=>$member_id,'member_code'=>$users[0]->member_code,'status'=>1,'bulk_type'=>1,'transfer_status'=>1,'atten_type'=>$attn_type,'member_type'=>$member_type,'punch_in_place'=>$request->location,'reason'=>$request->reason,'center_id'=>$request->center_id,'photo'=>$input['file'],'batch_id'=>$request->batch_id,'batch_code'=>$request->batch_code,'created_by'=>$trainer_id,'app_version'=>$request->app_version];
+                    $postParameter = ['user_id' => $user_id,'atten_date' => $request->attend_date,'punch_in'=>$time,'lat'=>$request->lat,'long'=>$request->long,'member_id'=>$member_id,'member_code'=>$users[0]->member_code,'status'=>1,'bulk_type'=>1,'transfer_status'=>1,'atten_type'=>$attn_type,'member_type'=>$member_type,'punch_in_place'=>$request->location,'reason'=>$request->reason,'atten_image'=>$input['file'],'created_by'=>$trainer_id,'app_version'=>$request->app_version];
 
                     $lastId=Attendance::create($postParameter)->id;
 
