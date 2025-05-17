@@ -926,13 +926,13 @@ class AttendanceController extends Controller
                                   //dd('jh');
                                   //dd($user_id,$x);
                                 Attendance::where('atten_date', $x['attend_date'])->where('user_id', $user_id)->update(['punch_out'=>$time,'punch_out_lat'=>$x['lat'],'punch_out_long'=>$x['long'],'status'=>1]);
-                                  dd($user_id);
+                                  //dd($user_id);
                                 $details = Attendance::where('atten_date', $x['attend_date'])->where('user_id', $user_id)->get();
             
-                                Photo::create(['user_id' => $user_id,'attendance_id'=>$details[0]->id,'punch_type'=>'O','photo_name'=>$input['file'],'lat'=>$x['lat'],'long'=>$x['long'],'place'=>$x['location'],'punch_time'=>$time,'punch_date'=>$x['attend_date'],'member_code'=>trim($users[0]->member_code)]);
+                                Photo::create(['user_id' => $user_id,'attendance_id'=>$details[0]->id,'punch_type'=>'O','photo_name'=>$input['file'],'lat'=>$x['lat'],'long'=>$x['long'],'punch_time'=>$time,'punch_date'=>$x['attend_date'],'member_code'=>trim($users[0]->member_code)]);
                                 
                                 $mob_id=DB::connection('mysql_2')->table('attendance_app')->where('member_id',$member_id)->where('atten_date',$x['attend_date'])->where('punch_type',"O")->get(['id']);
-                                
+                                dd($mob_id);
                                 if(sizeof($mob_id)>0){
                                     $mobile_id=$mob_id[0]->id;
                                     DB::connection('mysql_2')->table('attendance_app')->updateOrInsert([
@@ -946,7 +946,6 @@ class AttendanceController extends Controller
                                         'member_id' => $member_id,
                                         'member_code' => $users[0]->member_code,
                                         'status' => 1,
-                                        'punch_place' => $x['location'],
                                         'atten_type' => $atten_type,
                                         'member_type' => $member_type,
                                         'reason' => $x['reason'],
