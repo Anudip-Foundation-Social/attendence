@@ -303,7 +303,8 @@ class TrainerController extends Controller
        DB::beginTransaction();
         try { 
             date_default_timezone_set('Asia/Kolkata');
-            $time=date('H:i:s');$attn_type='present';
+            $time=date('H:i:s');
+            $attn_type='present';
             $member_type='student';
             if($request->image!=''){
                 
@@ -387,11 +388,31 @@ class TrainerController extends Controller
                         $member_type='staff';
                     }
 
-                    $postParameter = ['user_id' => $user_id,'atten_date' => $request->attend_date,'punch_in'=>$time,'lat'=>$request->lat,'long'=>$request->long,'member_id'=>$member_id,'member_code'=>$users[0]->member_code,'status'=>1,'bulk_type'=>1,'transfer_status'=>1,'atten_type'=>$attn_type,'member_type'=>$member_type,'punch_in_place'=>$request->location,'reason'=>$request->reason,'atten_image'=>$input['file'],'created_by'=>$trainer_id,'app_version'=>$request->app_version];
+                    
 
-                    $lastId=Attendance::create($postParameter)->id;
+                    $lastId=DB::table('attendances')->insertGetId([
+                        'user_id'         => $user_id,
+                        'atten_date'      => $request->atten_date,
+                        'punch_in'        => $time,
+                        'lat'             => $request->lat,
+                        'long'            => $request->long,
+                        'member_id'       => $member_id,
+                        'member_code'     => $users[0]->member_code,
+                        'member_type'     => $member_type,
+                        'transfer_status' => 1,
+                        'atten_type'      => $attn_type,
+                        'status'          => 1,
+                        'atten_image'     => $input['file'],
+                        'punch_in_place'  => $request->location,
+                        'reason'          => $request->reason,
+                        'bulk_type'       => 1,
+                        'created_by'      => $trainer_id,
+                        'app_version'     => $request->app_version,
+                        'created_at'      => now(),
+                        'updated_at'      => now(),
+                    ]);
 
-                    Photo::create(['user_id' => $user_id,'attendance_id'=>$lastId,'punch_type'=>'I','photo_name'=>$input['file'],'lat'=>$request->lat,'long'=>$request->long,'place'=>$request->location,'punch_time'=>$time,'punch_date'=>$request->attend_date,'member_code'=>trim($datas[0]->member_code)]);
+                    Photo::create(['user_id' => $user_id,'attendance_id'=>$lastId,'punch_type'=>'I','photo_name'=>$input['file'],'lat'=>$request->lat,'long'=>$request->long,'place'=>$request->location,'punch_time'=>$time,'punch_date'=>$request->attend_date,'member_code'=>trim($users[0]->member_code)]);
                     
                     $mob_id=DB::connection('mysql_2')->table('attendance_app')->insertGetId([
                         'user_id_mob_app' => $user_id,
