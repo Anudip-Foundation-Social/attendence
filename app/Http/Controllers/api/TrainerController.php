@@ -502,7 +502,7 @@ class TrainerController extends Controller
                             'approve_by' => $trainer_id,
                             'approve_at' => now(),
                         ]);
-                        dd($mob_id);
+                        //dd($mob_id);
                         
                     }else{
                         $mob_id=DB::connection('mysql_2')->table('attendance_app')->insertGetId([
@@ -529,7 +529,7 @@ class TrainerController extends Controller
                         ]);
                         $mobile_id=$mob_id;
                     }
-
+                    dd($mob_id);
                     DB::connection('mysql_2')->table('attendance_records')->updateOrInsert([
                         'member_id' => $member_id,
                         'punch_type'=>"O",
