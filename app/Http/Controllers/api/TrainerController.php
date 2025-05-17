@@ -475,7 +475,7 @@ class TrainerController extends Controller
                     Photo::create(['user_id' => $user_id,'attendance_id'=>$details[0]->id,'punch_type'=>'O','photo_name'=>$input['file'],'lat'=>$request->lat,'long'=>$request->long,'place'=>$request->location,'punch_time'=>$time,'punch_date'=>$request->attend_date,'member_code'=>trim($users[0]->member_code)]);
                     
                     $mob_id=DB::connection('mysql_2')->table('attendance_app')->where('member_id',$member_id)->where('atten_date',$request->attend_date)->where('punch_type',"O")->get(['id']);
-                    dd($mob_id);
+                    
                     if(sizeof($mob_id)>0){
                         $mobile_id=$mob_id[0]->id;
                         DB::connection('mysql_2')->table('attendance_app')->updateOrInsert([
@@ -502,6 +502,7 @@ class TrainerController extends Controller
                             'approve_by' => $trainer_id,
                             'approve_at' => now(),
                         ]);
+                        dd($mob_id);
                         
                     }else{
                         $mob_id=DB::connection('mysql_2')->table('attendance_app')->insertGetId([
