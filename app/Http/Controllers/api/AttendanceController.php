@@ -1084,6 +1084,7 @@ class AttendanceController extends Controller
                         
                         
             }
+            DB::commit(); 
             return Response(['message' => 'inserted successfully','status'=>1],200);
             
 
