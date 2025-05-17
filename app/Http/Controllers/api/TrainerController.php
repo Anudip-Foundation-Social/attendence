@@ -411,6 +411,7 @@ class TrainerController extends Controller
                         'created_at'      => now(),
                         'updated_at'      => now(),
                     ]);
+                    dd($lastId);
 
                     Photo::create(['user_id' => $user_id,'attendance_id'=>$lastId,'punch_type'=>'I','photo_name'=>$input['file'],'lat'=>$request->lat,'long'=>$request->long,'place'=>$request->location,'punch_time'=>$time,'punch_date'=>$request->attend_date,'member_code'=>trim($users[0]->member_code)]);
                     
