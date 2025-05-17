@@ -924,8 +924,8 @@ class AttendanceController extends Controller
                                     $member_type='staff';
                                 }
                                   //dd('jh');
-                                  dd($user_id,$x);
-                                Attendance::where('atten_date', $x['attend_date'])->where('user_id', $user_id)->update(['punch_out'=>$time,'punch_out_lat'=>$x['lat'],'punch_out_long'=>$x['long'],'status'=>1,'punch_out_place'=>$x['location']]);
+                                  //dd($user_id,$x);
+                                Attendance::where('atten_date', $x['attend_date'])->where('user_id', $user_id)->update(['punch_out'=>$time,'punch_out_lat'=>$x['lat'],'punch_out_long'=>$x['long'],'status'=>1]);
                                   dd($user_id);
                                 $details = Attendance::where('atten_date', $x['attend_date'])->where('user_id', $user_id)->get();
             
