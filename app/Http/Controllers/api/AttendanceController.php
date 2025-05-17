@@ -727,8 +727,9 @@ class AttendanceController extends Controller
        DB::beginTransaction();
        //dd('d');
         try { 
-           dd($request->all());
+           //dd($request->all());
             foreach($request->all() as $x){
+                dd($x);
                //dd(json_decode($a['studentList'], true));
                     $student_list=json_decode($x['studentList'], true);
             
