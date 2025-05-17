@@ -724,10 +724,10 @@ class AttendanceController extends Controller
     public function offlineSyncBulkPunchInOutAttendance(Request $request)
     {
         
-       // DB::beginTransaction();
-       dd('d');
+       DB::beginTransaction();
+       //dd('d');
         try { 
-           // dd($request->all());
+           dd($request->all());
             foreach($request->all() as $x){
                //dd(json_decode($a['studentList'], true));
                     $student_list=json_decode($x['studentList'], true);
