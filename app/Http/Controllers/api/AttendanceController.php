@@ -923,9 +923,9 @@ class AttendanceController extends Controller
                                 }else{
                                     $member_type='staff';
                                 }
-                                  dd('jh');
+                                  //dd('jh');
                                 Attendance::where('atten_date', $x['attend_date'])->where('user_id', $user_id)->update(['punch_out'=>$time,'punch_out_lat'=>$x['lat'],'punch_out_long'=>$x['long'],'status'=>1,'punch_out_place'=>$x['location']]);
-            
+                                  dd('bb');
                                 $details = Attendance::where('atten_date', $x['attend_date'])->where('user_id', $user_id)->get();
             
                                 Photo::create(['user_id' => $user_id,'attendance_id'=>$details[0]->id,'punch_type'=>'O','photo_name'=>$input['file'],'lat'=>$x['lat'],'long'=>$x['long'],'place'=>$x['location'],'punch_time'=>$time,'punch_date'=>$x['attend_date'],'member_code'=>trim($users[0]->member_code)]);
