@@ -529,23 +529,24 @@ class TrainerController extends Controller
                         ]);
                         $mobile_id=$mob_id;
                     }
-                    dd($mobile_id);
-                    DB::connection('mysql_2')->table('attendance_records')->updateOrInsert([
-                        'member_id' => $member_id,
-                        'punch_type'=>"O",
-                        DATE('punch_time')=>$request->attend_date
-                    ],[
-                        'source' => 'mobile_trainer',
-                        'mobile_app_id' => $mobile_id,
-                        'member_id'=>$member_id,
-                        'member_type'=>'student',
-                        'punch_type'=>"O",
-                        'flag_value'=>1,
-                        'punch_time'=>$request->attend_date." ".$time,
-                        'onetime'=>1,
-                        'created_at'=>now(),
-                        'attd_month'=>'All',
-                    ]);
+                    //dd($mobile_id);
+
+                    $insertGetBatchId = DB::connection('mysql_2')->table('attendance_records')->insertGetId(
+                        array(
+                            'source' => 'mobile_trainer',
+                            'mobile_app_id' => $mobile_id,
+                            'member_id'=>$member_id,
+                            'member_type'=>'student',
+                            'punch_type'=>"O",
+                            'flag_value'=>1,
+                            'punch_time'=>$request->attend_date." ".$time,
+                            'onetime'=>1,
+                            'created_at'=>now(),
+                            'attd_month'=>'All',
+                        )
+                    );
+
+                    
                     
                 }   
             }   
