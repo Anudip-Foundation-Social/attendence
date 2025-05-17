@@ -808,7 +808,7 @@ class AttendanceController extends Controller
                         foreach($student_list as $member_id){
 
                             $incount=Attendance::where('atten_date',$request->attend_date)->where('member_id',$member_id)->count();
-                            dd($incount);
+                           // dd($incount);
                             if($incount==0){
 
                                 $members=DB::connection('mysql_2')->table('members')->where('id',$member_id)->get(['member_code','first_name','last_name','email_id','mobile_no','gender']);
@@ -923,7 +923,7 @@ class AttendanceController extends Controller
                                 }else{
                                     $member_type='staff';
                                 }
-            
+                                  dd('jh');
                                 Attendance::where('atten_date', $x['attend_date'])->where('user_id', $user_id)->update(['punch_out'=>$time,'punch_out_lat'=>$x['lat'],'punch_out_long'=>$x['long'],'status'=>1,'punch_out_place'=>$x['location']]);
             
                                 $details = Attendance::where('atten_date', $x['attend_date'])->where('user_id', $user_id)->get();
