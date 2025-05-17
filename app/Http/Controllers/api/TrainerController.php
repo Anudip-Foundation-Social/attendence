@@ -461,7 +461,7 @@ class TrainerController extends Controller
                     $users=DB::table('users')->where('member_id', $member_id)->get(['id','member_code']);
                     $user_id= $users[0]->id;
 
-                    $atten_type=$request->atten_date==date('Y-m-d')?'present':'past';
+                    $atten_type=$request->attend_date==date('Y-m-d')?'present':'past';
                     if(str_starts_with($users[0]->member_code, 'AF')){
                         $member_type='student';
                     }else{
@@ -470,7 +470,7 @@ class TrainerController extends Controller
 
                     Attendance::where('atten_date', $request->attend_date)->where('user_id', $user_id)->update(['punch_out'=>$time,'punch_out_lat'=>$request->lat,'punch_out_long'=>$request->long,'status'=>1,'punch_out_place'=>$request->location]);
 
-                    $details = Attendance::where('atten_date', $request->attend_date)->where('user_id', $user_id)->get();
+                    $details = Attendance::where('attend_date', $request->attend_date)->where('user_id', $user_id)->get();
 
                     Photo::create(['user_id' => $user_id,'attendance_id'=>$details[0]->id,'punch_type'=>'O','photo_name'=>$input['file'],'lat'=>$request->lat,'long'=>$request->long,'place'=>$request->location,'punch_time'=>$time,'punch_date'=>$request->attend_date,'member_code'=>trim($datas[0]->member_code)]);
                     
