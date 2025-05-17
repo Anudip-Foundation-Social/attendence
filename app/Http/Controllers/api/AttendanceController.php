@@ -807,7 +807,7 @@ class AttendanceController extends Controller
                         //dd($student_list);
                         foreach($student_list as $member_id){
 
-                            $incount=Attendance::where('atten_date',$request->attend_date)->where('member_id',$member_id)->count();
+                            $incount=Attendance::where('atten_date',$x['attend_date'])->where('member_id',$member_id)->count();
                            // dd($incount);
                             if($incount==0){
                                 //dd($member_id);
