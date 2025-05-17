@@ -810,7 +810,7 @@ class AttendanceController extends Controller
                             $incount=Attendance::where('atten_date',$request->attend_date)->where('member_id',$member_id)->count();
                            // dd($incount);
                             if($incount==0){
-                                dd($member_id);
+                                //dd($member_id);
                                 $members=DB::connection('mysql_2')->table('members')->where('id',$member_id)->get(['member_code','first_name','last_name','email_id','mobile_no','gender']);
             
                                 DB::table('users')->updateOrInsert([
@@ -832,7 +832,7 @@ class AttendanceController extends Controller
                                     'gender'=>$members[0]->gender
                                 ]);
             
-                                
+                                dd('hg');
             
                                 $users=DB::table('users')->where('member_id', $member_id)->get(['id','member_code']);
                                 $user_id= $users[0]->id;
