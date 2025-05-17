@@ -729,7 +729,7 @@ class AttendanceController extends Controller
         try { 
            //dd($request->all());
             foreach($request->all() as $x){
-                dd($x);
+                
                //dd(json_decode($a['studentList'], true));
                     $student_list=json_decode($x['studentList'], true);
             
@@ -795,7 +795,8 @@ class AttendanceController extends Controller
                         unlink($file);
                         
                     }else{
-                        $input['file']='NA'; 
+                        //$input['file']='NA'; 
+                        return Response(['message' => 'Please attach Attendance images','status'=>1],200);
                     }  
                     //$input['file']='NA';
                     // $trainer_id=DB::connection('mysql_2')->table('users')->where('user_id', $x['user_id'])->value('id');
@@ -803,7 +804,7 @@ class AttendanceController extends Controller
                     $trainer_id=DB::connection('mysql_2')->table('users')->where('user_id', $trainer_username)->value('id');
                     //if($x['type']=='in'){
 
-                        
+                        dd($student_list);
                         foreach($student_list as $member_id){
 
                             $incount=Attendance::where('atten_date',$request->attend_date)->where('member_id',$member_id)->count();
