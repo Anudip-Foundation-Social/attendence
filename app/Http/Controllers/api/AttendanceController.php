@@ -832,7 +832,7 @@ class AttendanceController extends Controller
                                     'gender'=>$members[0]->gender
                                 ]);
             
-                                dd('hg');
+                                //dd('hg');
             
                                 $users=DB::table('users')->where('member_id', $member_id)->get(['id','member_code']);
                                 $user_id= $users[0]->id;
@@ -859,7 +859,6 @@ class AttendanceController extends Controller
                                     'atten_type'      => $attn_type,
                                     'status'          => 1,
                                     'atten_image'     => $input['file'],
-                                    'punch_in_place'  => $x['location'],
                                     'reason'          => $x['reason'],
                                     'bulk_type'       => 1,
                                     'created_by'      => $trainer_id,
@@ -869,7 +868,7 @@ class AttendanceController extends Controller
                                 ]);
                                 
             
-                                Photo::create(['user_id' => $user_id,'attendance_id'=>$lastId,'punch_type'=>'I','photo_name'=>$input['file'],'lat'=>$x['lat'],'long'=>$x['long'],'place'=>$x['location'],'punch_time'=>$time,'punch_date'=>$x['attend_date'],'member_code'=>trim($users[0]->member_code)]);
+                                Photo::create(['user_id' => $user_id,'attendance_id'=>$lastId,'punch_type'=>'I','photo_name'=>$input['file'],'lat'=>$x['lat'],'long'=>$x['long'],'punch_time'=>$time,'punch_date'=>$x['attend_date'],'member_code'=>trim($users[0]->member_code)]);
                                 
                                 $mob_id=DB::connection('mysql_2')->table('attendance_app')->insertGetId([
                                     'user_id_mob_app' => $user_id,
@@ -880,7 +879,6 @@ class AttendanceController extends Controller
                                     'member_id' => $member_id,
                                     'member_code' => $users[0]->member_code,
                                     'status' => 1,
-                                    'punch_place' => $x['location'],
                                     'atten_type' => $atten_type,
                                     'member_type' => $member_type,
                                     'reason' => $x['reason'],
