@@ -804,11 +804,11 @@ class AttendanceController extends Controller
                     $trainer_id=DB::connection('mysql_2')->table('users')->where('user_id', $trainer_username)->value('id');
                     //if($x['type']=='in'){
 
-                        dd($student_list);
+                        //dd($student_list);
                         foreach($student_list as $member_id){
 
                             $incount=Attendance::where('atten_date',$request->attend_date)->where('member_id',$member_id)->count();
-
+                            dd($incount);
                             if($incount==0){
 
                                 $members=DB::connection('mysql_2')->table('members')->where('id',$member_id)->get(['member_code','first_name','last_name','email_id','mobile_no','gender']);
