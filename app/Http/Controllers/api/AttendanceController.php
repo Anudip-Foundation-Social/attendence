@@ -532,7 +532,7 @@ class AttendanceController extends Controller
                     if($x['punch_out']==null){
                         //dd('k');
                         $punch_in=Attendance::where('atten_date', $x['attend_date'])->where('user_id', $x['user_id'])->value('punch_in');
-                        if($time<$punch_in){
+                        if($x['punch_in']<$punch_in){
                             Attendance::where('atten_date', $x['attend_date'])->where('user_id', $x['user_id'])->delete();
                             $lastId=Attendance::create($postParameter)->id;
                             Photo::create(['user_id' => $x['user_id'],'attendance_id'=>$lastId,'punch_type'=>'I','photo_name'=>$input['file'],'lat'=>$x['lat'],'long'=>$x['long'],'place'=>'','punch_time'=>$x['punch_in'],'punch_date'=>$x['attend_date'],'member_code'=>trim($x['member_code'])]);
