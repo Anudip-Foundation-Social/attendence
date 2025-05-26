@@ -438,20 +438,7 @@ class TrainerController extends Controller
                         'approve_at' => now(),
                     ]);
 
-                    $insertGetBatchId = DB::connection('mysql_2')->table('attendance_records')->insertGetId(
-                        array(
-                            'source' => 'mobile_trainer',
-                            'mobile_app_id' => $mob_id,
-                            'member_id'=>$member_id,
-                            'member_type'=>'student',
-                            'punch_type'=>"I",
-                            'flag_value'=>1,
-                            'punch_time'=>$request->attend_date." ".$time,
-                            'onetime'=>1,
-                            'created_at'=>now(),
-                            'attd_month'=>'All',
-                        )
-                    );
+                    
                     
                   
                     
@@ -536,22 +523,10 @@ class TrainerController extends Controller
 
                     }
 
-                    $mob_id=DB::connection('mysql_2')->table('attendance_app')->where('member_id',$member_id)->where('atten_date',$request->attend_date)->get(['id']);
+                    
                         //dd($mob_id,$member_id,$request->attend_date); 
-                    $insertGetBatchId = DB::connection('mysql_2')->table('attendance_records')->insertGetId(
-                        array(
-                            'source' => 'mobile_trainer',
-                            'mobile_app_id' => $mob_id[0]->id,
-                            'member_id'=>$member_id,
-                            'member_type'=>'student',
-                            'punch_type'=>"O",
-                            'flag_value'=>1,
-                            'punch_time'=>$request->attend_date." ".$time,
-                            'onetime'=>1,
-                            'created_at'=>now(),
-                            'attd_month'=>'All',
-                        )
-                    );
+                        
+                    
                     
                     // $mob_id=DB::connection('mysql_2')->table('attendance_app')->where('member_id',$member_id)->where('atten_date',$request->attend_date)->where('punch_type',"O")->get(['id']);
                     
@@ -608,6 +583,23 @@ class TrainerController extends Controller
                         ]);
                         $mobile_id=$mob_id;
                 }
+
+                $mob_id=DB::connection('mysql_2')->table('attendance_app')->where('member_id',$member_id)->where('atten_date',$request->attend_date)->get(['id']);
+
+                $insertGetBatchId = DB::connection('mysql_2')->table('attendance_records')->insertGetId(
+                    array(
+                        'source' => 'mobile_trainer',
+                        'mobile_app_id' => $mob_id,
+                        'member_id'=>$member_id,
+                        'member_type'=>'student',
+                        'punch_type'=>"I",
+                        'flag_value'=>1,
+                        'punch_time'=>$request->attend_date." ".$time,
+                        'onetime'=>1,
+                        'created_at'=>now(),
+                        'attd_month'=>'All',
+                    )
+                );
                     //dd($mobile_id);
 
                
