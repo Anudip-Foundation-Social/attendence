@@ -352,7 +352,7 @@ class TrainerController extends Controller
             foreach($request->studentList as $member_id){
 
                 $incount=Attendance::where('atten_date',$request->attend_date)->where('member_id',$member_id)->count();
-                 //dd($incount);
+                 dd($incount);
                 if($incount==0){
 
                     $members=DB::connection('mysql_2')->table('members')->where('id',$member_id)->get(['member_code','first_name','last_name','email_id','mobile_no','gender']);
@@ -595,7 +595,7 @@ class TrainerController extends Controller
 
                     $mob_id=DB::connection('mysql_2')->table('attendance_app')->where('member_id',$member_id)->where('atten_date',$request->attend_date)->where('punch_type',"O")->get(['id']);
 
-                $insertGetBatchId = DB::connection('mysql_2')->table('attendance_records')->insertGetId(
+                    $insertGetBatchId = DB::connection('mysql_2')->table('attendance_records')->insertGetId(
                     array(
                         'source' => 'mobile_trainer',
                         'mobile_app_id' => $mob_id[0]->id,
