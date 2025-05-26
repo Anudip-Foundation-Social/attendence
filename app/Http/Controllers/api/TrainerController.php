@@ -464,6 +464,7 @@ class TrainerController extends Controller
 
                     $users=DB::table('users')->where('member_id', $member_id)->get(['id','member_code']);
                     $user_id= $users[0]->id;
+                    dd($user_id);
 
                     $atten_type=$request->attend_date==date('Y-m-d')?'present':'past';
                     if(str_starts_with($users[0]->member_code, 'AF')){
