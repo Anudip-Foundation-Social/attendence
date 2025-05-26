@@ -453,7 +453,7 @@ class TrainerController extends Controller
                         )
                     );
                     
-                   dd('dd'); 
+                  
                     
 
                 }else{
@@ -594,7 +594,7 @@ class TrainerController extends Controller
                     //dd($mobile_id);
 
                     $mob_id=DB::connection('mysql_2')->table('attendance_app')->where('member_id',$member_id)->where('atten_date',$request->attend_date)->where('punch_type',"O")->get(['id']);
-
+                    dd($mob_id,$member_id,$request->attend_date); 
                     $insertGetBatchId = DB::connection('mysql_2')->table('attendance_records')->insertGetId(
                     array(
                         'source' => 'mobile_trainer',
