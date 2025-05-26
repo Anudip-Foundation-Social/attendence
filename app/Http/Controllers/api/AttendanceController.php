@@ -1382,7 +1382,7 @@ class AttendanceController extends Controller
                                     }
                                 }
                                 
-                                // $mob_id=DB::connection('mysql_2')->table('attendance_app')->where('member_id',$member_id)->where('atten_date',$x['attend_date'])->where('punch_type',"O")->get(['id']);
+                                $mob_id=DB::connection('mysql_2')->table('attendance_app')->where('member_id',$member_id)->where('atten_date',$x['attend_date'])->where('punch_type',"O")->get(['id']);
                                 //dd($mob_id);
                                 // if(sizeof($mob_id)>0){
                                 //     $mobile_id=$mob_id[0]->id;
@@ -1440,7 +1440,7 @@ class AttendanceController extends Controller
                                 $insertGetBatchId = DB::connection('mysql_2')->table('attendance_records')->insertGetId(
                                     array(
                                         'source' => 'mobile_trainer',
-                                        'mobile_app_id' => $mobile_id,
+                                        'mobile_app_id' => $mob_id,
                                         'member_id'=>$member_id,
                                         'member_type'=>'student',
                                         'punch_type'=>"O",
