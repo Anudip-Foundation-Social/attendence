@@ -470,7 +470,7 @@ class TrainerController extends Controller
 
                     $studenttime=Attendance::where('atten_date',$request->attend_date)->where('user_id',$user_id)->get(['punch_in','punch_out']);
 
-                    if($studenttime[0]->punch_in<$time){
+                    if($time<$studenttime[0]->punch_in){
                         Attendance::where('atten_date', $request->attend_date)->where('user_id', $user_id)->update(['punch_in'=>$time,'status'=>1,'punch_out_place'=>$request->location]);
                     }else{
                         // Attendance::where('atten_date', $request->attend_date)->where('user_id', $user_id)->update(['punch_out'=>$time,'status'=>1,'punch_out_place'=>$request->location]);
