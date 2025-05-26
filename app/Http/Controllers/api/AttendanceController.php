@@ -930,9 +930,6 @@ class AttendanceController extends Controller
                                 }else{
                                     Attendance::where('atten_date', $x['attend_date'])->where('user_id', $user_id)->update(['punch_out'=>$time,'status'=>1]);
                                 }
-
-                                
-
                                 
                                 $details = Attendance::where('atten_date', $x['attend_date'])->where('user_id', $user_id)->get();
             
