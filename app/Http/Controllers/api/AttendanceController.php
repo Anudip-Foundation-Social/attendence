@@ -1440,7 +1440,7 @@ class AttendanceController extends Controller
                                 $insertGetBatchId = DB::connection('mysql_2')->table('attendance_records')->insertGetId(
                                     array(
                                         'source' => 'mobile_trainer',
-                                        'mobile_app_id' => $mob_id,
+                                        'mobile_app_id' => $mob_id[0]->id,
                                         'member_id'=>$member_id,
                                         'member_type'=>'student',
                                         'punch_type'=>"O",
