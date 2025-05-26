@@ -468,43 +468,105 @@ class TrainerController extends Controller
                         $member_type='staff';
                     }
 
-                    Attendance::where('atten_date', $request->attend_date)->where('user_id', $user_id)->update(['punch_out'=>$time,'punch_out_lat'=>$request->lat,'punch_out_long'=>$request->long,'status'=>1,'punch_out_place'=>$request->location]);
+                    $studenttime=Attendance::where('atten_date',$request->attend_date)->where('user_id',$user_id)->get(['punch_in','punch_out']);
+
+                    if($studenttime[0]->punch_in<$time){
+                        Attendance::where('atten_date', $request->attend_date)->where('user_id', $user_id)->update(['punch_in'=>$time,'status'=>1,'punch_out_place'=>$request->location]);
+                    }else{
+                        // Attendance::where('atten_date', $request->attend_date)->where('user_id', $user_id)->update(['punch_out'=>$time,'status'=>1,'punch_out_place'=>$request->location]);
+
+                        $checkOutTime=Attendance::where('member_id',$user_id)->where('atten_date',$request->attend_date)->where('punch_type',"O")->value('punch_time');
+
+                        if($time>$checkOutTime){
+
+                            Attendance::where('atten_date', $request->attend_date)->where('user_id', $user_id)->update(['punch_out'=>$time,'status'=>1]);
+                        }
+                    }
+
+                    
 
                     $details = Attendance::where('atten_date', $request->attend_date)->where('user_id', $user_id)->get();
 
                     Photo::create(['user_id' => $user_id,'attendance_id'=>$details[0]->id,'punch_type'=>'O','photo_name'=>$input['file'],'lat'=>$request->lat,'long'=>$request->long,'place'=>$request->location,'punch_time'=>$time,'punch_date'=>$request->attend_date,'member_code'=>trim($users[0]->member_code)]);
-                    
-                    $mob_id=DB::connection('mysql_2')->table('attendance_app')->where('member_id',$member_id)->where('atten_date',$request->attend_date)->where('punch_type',"O")->get(['id']);
-                    
-                    if(sizeof($mob_id)>0){
-                        $mobile_id=$mob_id[0]->id;
-                        DB::connection('mysql_2')->table('attendance_app')->updateOrInsert([
-                            'id' => $mob_id[0]->id,
-                        ],[
-                            'user_id_mob_app' => $user_id,
-                            'atten_date' => $request->attend_date,
-                            'punch_time' => $time,
-                            'lat' => $request->lat,
-                            'long' => $request->long,
-                            'member_id' => $member_id,
-                            'member_code' => $users[0]->member_code,
-                            'status' => 1,
-                            'punch_place' => $request->location,
-                            'atten_type' => $atten_type,
-                            'member_type' => $member_type,
-                            'reason' => $request->reason,
-                            'center_id' => $request->center_id,
-                            'punch_type' =>"O",
-                            'photo' => $input['file'],
-                            'batch_code' => $request->batch_code,
-                            'update_attn_status' => 1,
-                            'bulk_type' => 1,
-                            'approve_by' => $trainer_id,
-                            'approve_at' => now(),
-                        ]);
-                        //dd($mob_id);
-                        
+
+                    $checkInTime=DB::connection('mysql_2')->table('attendance_app')->where('member_id',$member_id)->where('atten_date',$request->attend_date)->where('punch_type','I')->value('punch_time');
+
+                    if($checkInTime>$time){
+                        $checkInTime=DB::connection('mysql_2')->table('attendance_app')->where('member_id',$member_id)->where('atten_date',$request->attend_date)->where('punch_type','I')->update(['punch_time' =>$time]);
                     }else{
+
+                        $checkOutTime=DB::connection('mysql_2')->table('attendance_app')->where('member_id',$member_id)->where('atten_date',$request->attend_date)->where('punch_type',"O")->value('punch_time');
+                        if($time>$checkOutTime){
+                            DB::connection('mysql_2')->table('attendance_app')->updateOrInsert([
+                                'member_id'=>$member_id,
+                                'atten_date'=>$request->attend_date,
+                                'punch_type'=>"O"
+                            ],[
+                               
+                                'punch_time' => $time,
+                                
+                            ]);
+                        }else{
+
+                            $mob_id=DB::connection('mysql_2')->table('attendance_app')->insertGetId([
+                                'user_id_mob_app' => $user_id,
+                                'atten_date' => $request->attend_date,
+                                'punch_time' => $time,
+                                'lat' => $request->lat,
+                                'long' => $request->long,
+                                'member_id' => $member_id,
+                                'member_code' => $users[0]->member_code,
+                                'status' => 1,
+                                'punch_place' => $request->location,
+                                'atten_type' => $atten_type,
+                                'member_type' => $member_type,
+                                'reason' => $request->reason,
+                                'center_id' => $request->center_id,
+                                'punch_type' =>"O",
+                                'photo' => $input['file'],
+                                'batch_code' => $request->batch_code,
+                                'update_attn_status' => 1,
+                                'bulk_type' => 1,
+                                'approve_by' => $trainer_id,
+                                'approve_at' => now(),
+                            ]);
+                            $mobile_id=$mob_id;
+
+                        }
+
+                    }
+                    
+                    // $mob_id=DB::connection('mysql_2')->table('attendance_app')->where('member_id',$member_id)->where('atten_date',$request->attend_date)->where('punch_type',"O")->get(['id']);
+                    
+                    // if(sizeof($mob_id)>0){
+                    //     $mobile_id=$mob_id[0]->id;
+                    //     DB::connection('mysql_2')->table('attendance_app')->updateOrInsert([
+                    //         'id' => $mob_id[0]->id,
+                    //     ],[
+                    //         'user_id_mob_app' => $user_id,
+                    //         'atten_date' => $request->attend_date,
+                    //         'punch_time' => $time,
+                    //         'lat' => $request->lat,
+                    //         'long' => $request->long,
+                    //         'member_id' => $member_id,
+                    //         'member_code' => $users[0]->member_code,
+                    //         'status' => 1,
+                    //         'punch_place' => $request->location,
+                    //         'atten_type' => $atten_type,
+                    //         'member_type' => $member_type,
+                    //         'reason' => $request->reason,
+                    //         'center_id' => $request->center_id,
+                    //         'punch_type' =>"O",
+                    //         'photo' => $input['file'],
+                    //         'batch_code' => $request->batch_code,
+                    //         'update_attn_status' => 1,
+                    //         'bulk_type' => 1,
+                    //         'approve_by' => $trainer_id,
+                    //         'approve_at' => now(),
+                    //     ]);
+                    //     //dd($mob_id);
+                        
+                    // }else{
                         $mob_id=DB::connection('mysql_2')->table('attendance_app')->insertGetId([
                             'user_id_mob_app' => $user_id,
                             'atten_date' => $request->attend_date,
@@ -528,27 +590,27 @@ class TrainerController extends Controller
                             'approve_at' => now(),
                         ]);
                         $mobile_id=$mob_id;
-                    }
+                }
                     //dd($mobile_id);
 
-                    $insertGetBatchId = DB::connection('mysql_2')->table('attendance_records')->insertGetId(
-                        array(
-                            'source' => 'mobile_trainer',
-                            'mobile_app_id' => $mobile_id,
-                            'member_id'=>$member_id,
-                            'member_type'=>'student',
-                            'punch_type'=>"O",
-                            'flag_value'=>1,
-                            'punch_time'=>$request->attend_date." ".$time,
-                            'onetime'=>1,
-                            'created_at'=>now(),
-                            'attd_month'=>'All',
-                        )
-                    );
+                $insertGetBatchId = DB::connection('mysql_2')->table('attendance_records')->insertGetId(
+                    array(
+                        'source' => 'mobile_trainer',
+                        'mobile_app_id' => $mobile_id,
+                        'member_id'=>$member_id,
+                        'member_type'=>'student',
+                        'punch_type'=>"O",
+                        'flag_value'=>1,
+                        'punch_time'=>$request->attend_date." ".$time,
+                        'onetime'=>1,
+                        'created_at'=>now(),
+                        'attd_month'=>'All',
+                    )
+                );
 
                     
                     
-                }   
+                  
             }   
                 
             DB::commit();   

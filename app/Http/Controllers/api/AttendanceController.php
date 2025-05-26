@@ -129,6 +129,7 @@ class AttendanceController extends Controller
        // DB::beginTransaction();
         try { 
             date_default_timezone_set('Asia/Kolkata');
+            $member_id=$request->member_id;
                 if(str_starts_with($request->member_code, 'AF')){
                 $member_type='student';
                 }else{
@@ -142,7 +143,7 @@ class AttendanceController extends Controller
                     $attn_type='present';
                 }
                 
-            $details = Attendance::where('atten_date', $request->attend_date)->where('user_id', $request->user_id)->get();
+            
             if($request->image!=''){
                 $s3_path="attendance/".trim($request->attend_date)."/";
                 $folderPath = "volume_blr1_01/".trim($request->attend_date)."/";
@@ -182,55 +183,267 @@ class AttendanceController extends Controller
                 $input['file']='NA'; 
             }    
 
-            $postParameter = ['user_id' => $request->user_id,'atten_date' => $request->attend_date,'punch_in'=>$time,'lat'=>$request->lat,'long'=>$request->long,'member_id'=>$request->member_id,'member_code'=>$request->member_code,'status'=>2,'transfer_status'=>1,'atten_type'=>$attn_type,'member_type'=>$member_type,'punch_in_place'=>$request->location,'reason'=>$request->reason,'center_id'=>$request->center_id,'photo'=>$input['file'],'batch_id'=>$request->batch_id,'batch_code'=>$request->batch_code,'app_version'=>$request->app_version];
-            if(sizeof($details)>0){
-                //dd($details[0]->id);
-                $sts=Attendance::where('atten_date', $request->attend_date)->where('user_id', $details[0]->user_id)->get(['status','punch_out']);
-                //dd($sts);
-                if (
-                    ($sts[0]->status != 1 && $sts[0]->status != 3) ||
-                    ($sts[0]->status == 1 && $sts[0]->punch_out == null)
-                ) { 
+            // $postParameter = ['user_id' => $request->user_id,'atten_date' => $request->attend_date,'punch_in'=>$time,'lat'=>$request->lat,'long'=>$request->long,'member_id'=>$request->member_id,'member_code'=>$request->member_code,'status'=>2,'transfer_status'=>1,'atten_type'=>$attn_type,'member_type'=>$member_type,'punch_in_place'=>$request->location,'reason'=>$request->reason,'center_id'=>$request->center_id,'photo'=>$input['file'],'batch_id'=>$request->batch_id,'batch_code'=>$request->batch_code,'app_version'=>$request->app_version];
+
+            $incount = Attendance::where('atten_date', $request->attend_date)->where('user_id', $request->user_id)->count();
+
+            if($incount==0){
+
+                // $members=DB::connection('mysql_2')->table('members')->where('id',$member_id)->get(['member_code','first_name','last_name','email_id','mobile_no','gender']);
+
+                $users=DB::table('users')->where('member_id', $member_id)->get(['id','member_code']);
+                $user_id= $users[0]->id;
+
+                $atten_type=$request->attend_date==date('Y-m-d')?'present':'past';
+                if(str_starts_with($users[0]->member_code, 'AF')){
+                    $member_type='student';
+                }else{
+                    $member_type='staff';
+                }
+
+                
+
+                $lastId=DB::table('attendances')->insertGetId([
+                    'user_id'         => $user_id,
+                    'atten_date'      => $request->attend_date,
+                    'punch_in'        => $time,
+                    'lat'             => $request->lat,
+                    'long'            => $request->long,
+                    'member_id'       => $member_id,
+                    'member_code'     => $users[0]->member_code,
+                    'member_type'     => $member_type,
+                    'transfer_status' => 1,
+                    'atten_type'      => $attn_type,
+                    'status'          => 2,
+                    'atten_image'     => $input['file'],
+                    'punch_in_place'  => $request->location,
+                    'reason'          => $request->reason,
+                    'bulk_type'       => 0,
+                    'app_version'     => $request->app_version,
+                    'created_at'      => now(),
+                    'updated_at'      => now(),
+                ]);
+                
+
+                Photo::create(['user_id' => $user_id,'attendance_id'=>$lastId,'punch_type'=>'I','photo_name'=>$input['file'],'lat'=>$request->lat,'long'=>$request->long,'place'=>$request->location,'punch_time'=>$time,'punch_date'=>$request->attend_date,'member_code'=>trim($users[0]->member_code)]);
+                
+                $mob_id=DB::connection('mysql_2')->table('attendance_app')->insertGetId([
+                    'user_id_mob_app' => $user_id,
+                    'atten_date' => $request->attend_date,
+                    'punch_time' => $time,
+                    'lat' => $request->lat,
+                    'long' => $request->long,
+                    'member_id' => $member_id,
+                    'member_code' => $users[0]->member_code,
+                    'status' => 1,
+                    'punch_place' => $request->location,
+                    'atten_type' => $atten_type,
+                    'member_type' => $member_type,
+                    'reason' => $request->reason,
+                    'center_id' => $request->center_id,///
+                    'punch_type' =>"I",
+                    'photo' => $input['file'],
+                    'batch_code' => $request->batch_code,/////
+                    'update_attn_status' => 1,
+                    'bulk_type' => 1,
+                ]);
+
+                // $insertGetBatchId = DB::connection('mysql_2')->table('attendance_records')->insertGetId(
+                //     array(
+                //         'source' => 'mobile_trainer',
+                //         'mobile_app_id' => $mob_id,
+                //         'member_id'=>$member_id,
+                //         'member_type'=>'student',
+                //         'punch_type'=>"I",
+                //         'flag_value'=>1,
+                //         'punch_time'=>$request->attend_date." ".$time,
+                //         'onetime'=>1,
+                //         'created_at'=>now(),
+                //         'attd_month'=>'All',
+                //     )
+                // );
+                
+                
+                
+
+            }else{
+
+                $users=DB::table('users')->where('member_id', $member_id)->get(['id','member_code']);
+                $user_id= $users[0]->id;
+
+                $atten_type=$request->attend_date==date('Y-m-d')?'present':'past';
+                if(str_starts_with($users[0]->member_code, 'AF')){
+                    $member_type='student';
+                }else{
+                    $member_type='staff';
+                }
+
+                $studenttime=Attendance::where('atten_date',$request->attend_date)->where('user_id',$user_id)->get(['punch_in','punch_out']);
+
+                if($studenttime[0]->punch_in<$time){
+                    Attendance::where('atten_date', $request->attend_date)->where('user_id', $user_id)->update(['punch_in'=>$time,'status'=>1,'punch_out_place'=>$request->location]);
+                }else{
+                    // Attendance::where('atten_date', $request->attend_date)->where('user_id', $user_id)->update(['punch_out'=>$time,'status'=>1,'punch_out_place'=>$request->location]);
+
+                    $checkOutTime=Attendance::where('member_id',$user_id)->where('atten_date',$request->attend_date)->where('punch_type',"O")->value('punch_time');
+
+                    if($time>$checkOutTime){
+
+                        Attendance::where('atten_date', $request->attend_date)->where('user_id', $user_id)->update(['punch_out'=>$time,'status'=>1]);
+                    }
+                }
+
+                
+
+                $details = Attendance::where('atten_date', $request->attend_date)->where('user_id', $user_id)->get();
+
+                Photo::create(['user_id' => $user_id,'attendance_id'=>$details[0]->id,'punch_type'=>'O','photo_name'=>$input['file'],'lat'=>$request->lat,'long'=>$request->long,'place'=>$request->location,'punch_time'=>$time,'punch_date'=>$request->attend_date,'member_code'=>trim($users[0]->member_code)]);
+
+                $checkInTime=DB::connection('mysql_2')->table('attendance_app')->where('member_id',$member_id)->where('atten_date',$request->attend_date)->where('punch_type','I')->value('punch_time');
+
+                if($checkInTime>$time){
+                    $checkInTime=DB::connection('mysql_2')->table('attendance_app')->where('member_id',$member_id)->where('atten_date',$request->attend_date)->where('punch_type','I')->update(['punch_time' =>$time]);
+                }else{
+
+                    $checkOutTime=DB::connection('mysql_2')->table('attendance_app')->where('member_id',$member_id)->where('atten_date',$request->attend_date)->where('punch_type',"O")->value('punch_time');
+                    if($time>$checkOutTime){
+                        DB::connection('mysql_2')->table('attendance_app')->updateOrInsert([
+                            'member_id'=>$member_id,
+                            'atten_date'=>$request->attend_date,
+                            'punch_type'=>"O"
+                        ],[
+                           
+                            'punch_time' => $time,
+                            
+                        ]);
+                    }else{
+
+                        $mob_id=DB::connection('mysql_2')->table('attendance_app')->insertGetId([
+                            'user_id_mob_app' => $user_id,
+                            'atten_date' => $request->attend_date,
+                            'punch_time' => $time,
+                            'lat' => $request->lat,
+                            'long' => $request->long,
+                            'member_id' => $member_id,
+                            'member_code' => $users[0]->member_code,
+                            'status' => 2,
+                            'punch_place' => $request->location,
+                            'atten_type' => $atten_type,
+                            'member_type' => $member_type,
+                            'reason' => $request->reason,
+                            'center_id' => $request->center_id,
+                            'punch_type' =>"O",
+                            'photo' => $input['file'],
+                            'batch_code' => $request->batch_code,
+                            'update_attn_status' => 1,
+                        ]);
+                        $mobile_id=$mob_id;
+
+                    }
+
+                }
+                
+                // $mob_id=DB::connection('mysql_2')->table('attendance_app')->where('member_id',$member_id)->where('atten_date',$request->attend_date)->where('punch_type',"O")->get(['id']);
+                
+                // if(sizeof($mob_id)>0){
+                //     $mobile_id=$mob_id[0]->id;
+                //     DB::connection('mysql_2')->table('attendance_app')->updateOrInsert([
+                //         'id' => $mob_id[0]->id,
+                //     ],[
+                //         'user_id_mob_app' => $user_id,
+                //         'atten_date' => $request->attend_date,
+                //         'punch_time' => $time,
+                //         'lat' => $request->lat,
+                //         'long' => $request->long,
+                //         'member_id' => $member_id,
+                //         'member_code' => $users[0]->member_code,
+                //         'status' => 1,
+                //         'punch_place' => $request->location,
+                //         'atten_type' => $atten_type,
+                //         'member_type' => $member_type,
+                //         'reason' => $request->reason,
+                //         'center_id' => $request->center_id,
+                //         'punch_type' =>"O",
+                //         'photo' => $input['file'],
+                //         'batch_code' => $request->batch_code,
+                //         'update_attn_status' => 1,
+                //         'bulk_type' => 1,
+                //         'approve_by' => $trainer_id,
+                //         'approve_at' => now(),
+                //     ]);
+                //     //dd($mob_id);
+                    
+                // }else{
+                    $mob_id=DB::connection('mysql_2')->table('attendance_app')->insertGetId([
+                        'user_id_mob_app' => $user_id,
+                        'atten_date' => $request->attend_date,
+                        'punch_time' => $time,
+                        'lat' => $request->lat,
+                        'long' => $request->long,
+                        'member_id' => $member_id,
+                        'member_code' => $users[0]->member_code,
+                        'status' => 2,
+                        'punch_place' => $request->location,
+                        'atten_type' => $atten_type,
+                        'member_type' => $member_type,
+                        'reason' => $request->reason,
+                        'center_id' => $request->center_id,
+                        'punch_type' =>"O",
+                        'photo' => $input['file'],
+                        'batch_code' => $request->batch_code,
+                        'update_attn_status' => 1,
+                    ]);
+                    $mobile_id=$mob_id;
+            }
+
+            // if(sizeof($details)>0){
+            //     //dd($details[0]->id);
+            //     $sts=Attendance::where('atten_date', $request->attend_date)->where('user_id', $details[0]->user_id)->get(['status','punch_out']);
+            //     //dd($sts);
+            //     if (
+            //         ($sts[0]->status != 1 && $sts[0]->status != 3) ||
+            //         ($sts[0]->status == 1 && $sts[0]->punch_out == null)
+            //     ) { 
 
                     
-                    $curlHandle = curl_init('https://cmis3api.anudip.org/api/insertFromAttenApp');
-                    curl_setopt($curlHandle, CURLOPT_POSTFIELDS, $postParameter);
-                    curl_setopt($curlHandle, CURLOPT_RETURNTRANSFER, true);
-                    $curlResponse = curl_exec($curlHandle);
-                    //dd($curlResponse);
-                    curl_close($curlHandle);
-                    Attendance::where('atten_date', $request->attend_date)->where('user_id', $details[0]->user_id)->update(['punch_out'=>$time,'punch_out_lat'=>$request->lat,'punch_out_long'=>$request->long,'status'=>0,'punch_out_place'=>$request->location]);
+            //         $curlHandle = curl_init('https://cmis3api.anudip.org/api/insertFromAttenApp');
+            //         curl_setopt($curlHandle, CURLOPT_POSTFIELDS, $postParameter);
+            //         curl_setopt($curlHandle, CURLOPT_RETURNTRANSFER, true);
+            //         $curlResponse = curl_exec($curlHandle);
+            //         //dd($curlResponse);
+            //         curl_close($curlHandle);
+            //         Attendance::where('atten_date', $request->attend_date)->where('user_id', $details[0]->user_id)->update(['punch_out'=>$time,'punch_out_lat'=>$request->lat,'punch_out_long'=>$request->long,'status'=>0,'punch_out_place'=>$request->location]);
 
-                    Photo::create(['user_id' => $request->user_id,'attendance_id'=>$details[0]->id,'punch_type'=>'O','photo_name'=>$input['file'],'lat'=>$request->lat,'long'=>$request->long,'place'=>$request->location,'punch_time'=>$time,'punch_date'=>$request->attend_date,'member_code'=>trim($request->member_code)]);
+            //         Photo::create(['user_id' => $request->user_id,'attendance_id'=>$details[0]->id,'punch_type'=>'O','photo_name'=>$input['file'],'lat'=>$request->lat,'long'=>$request->long,'place'=>$request->location,'punch_time'=>$time,'punch_date'=>$request->attend_date,'member_code'=>trim($request->member_code)]);
 
-                    $x=['punch_out'=>$time,'date' => $request->attend_date,'punch_in'=>$details[0]->punch_in];
-                } 
-                // if($sts[0]->status==1 && $sts[0]->punch_out==null){
+            //         $x=['punch_out'=>$time,'date' => $request->attend_date,'punch_in'=>$details[0]->punch_in];
+            //     } 
+            //     // if($sts[0]->status==1 && $sts[0]->punch_out==null){
 
-                //     $curlHandle = curl_init('https://cmis3api.anudip.org/api/insertFromAttenApp');
-                //     curl_setopt($curlHandle, CURLOPT_POSTFIELDS, $postParameter);
-                //     curl_setopt($curlHandle, CURLOPT_RETURNTRANSFER, true);
-                //     $curlResponse = curl_exec($curlHandle);
-                //     //dd($curlResponse);
-                //     curl_close($curlHandle);
-                //     Attendance::where('atten_date', $request->attend_date)->where('user_id', $details[0]->user_id)->update(['punch_out'=>$time,'punch_out_lat'=>$request->lat,'punch_out_long'=>$request->long,'status'=>0,'punch_out_place'=>$request->location]);
+            //     //     $curlHandle = curl_init('https://cmis3api.anudip.org/api/insertFromAttenApp');
+            //     //     curl_setopt($curlHandle, CURLOPT_POSTFIELDS, $postParameter);
+            //     //     curl_setopt($curlHandle, CURLOPT_RETURNTRANSFER, true);
+            //     //     $curlResponse = curl_exec($curlHandle);
+            //     //     //dd($curlResponse);
+            //     //     curl_close($curlHandle);
+            //     //     Attendance::where('atten_date', $request->attend_date)->where('user_id', $details[0]->user_id)->update(['punch_out'=>$time,'punch_out_lat'=>$request->lat,'punch_out_long'=>$request->long,'status'=>0,'punch_out_place'=>$request->location]);
 
-                //     Photo::create(['user_id' => $request->user_id,'attendance_id'=>$details[0]->id,'punch_type'=>'O','photo_name'=>$input['file'],'lat'=>$request->lat,'long'=>$request->long,'place'=>$request->location,'punch_time'=>$time,'punch_date'=>$request->attend_date,'member_code'=>trim($request->member_code)]);
+            //     //     Photo::create(['user_id' => $request->user_id,'attendance_id'=>$details[0]->id,'punch_type'=>'O','photo_name'=>$input['file'],'lat'=>$request->lat,'long'=>$request->long,'place'=>$request->location,'punch_time'=>$time,'punch_date'=>$request->attend_date,'member_code'=>trim($request->member_code)]);
 
-                //     $x=['punch_out'=>$time,'date' => $request->attend_date,'punch_in'=>$details[0]->punch_in];
+            //     //     $x=['punch_out'=>$time,'date' => $request->attend_date,'punch_in'=>$details[0]->punch_in];
 
-                // }  
+            //     // }  
 
-                DB::commit();
-                $x=['punch_out'=>$time,'date' => $request->attend_date,'punch_in'=>$details[0]->punch_in];
-                    return Response(['message' => 'updated successfully','status'=>1,'data'=>$x],200);
-            }
-            //code for update end
+            //     DB::commit();
+            //     $x=['punch_out'=>$time,'date' => $request->attend_date,'punch_in'=>$details[0]->punch_in];
+            //         return Response(['message' => 'updated successfully','status'=>1,'data'=>$x],200);
+            // }
+            // //code for update end
             
-            $curlHandle = curl_init('https://cmis3api.anudip.org/api/insertFromAttenApp');
-            curl_setopt($curlHandle, CURLOPT_POSTFIELDS, $postParameter);
-            curl_setopt($curlHandle, CURLOPT_RETURNTRANSFER, true);
-            $curlResponse = curl_exec($curlHandle);
+            // $curlHandle = curl_init('https://cmis3api.anudip.org/api/insertFromAttenApp');
+            // curl_setopt($curlHandle, CURLOPT_POSTFIELDS, $postParameter);
+            // curl_setopt($curlHandle, CURLOPT_RETURNTRANSFER, true);
+            // $curlResponse = curl_exec($curlHandle);
             //dd($curlResponse);
             // // if(){
                  
@@ -239,10 +452,10 @@ class AttendanceController extends Controller
             //     $postParameter['transfer_status']=0;
             // }
             // //dd($postParameter);
-            $lastId=Attendance::create($postParameter)->id;
-            Photo::create(['user_id' => $request->user_id,'attendance_id'=>$lastId,'punch_type'=>'I','photo_name'=>$input['file'],'lat'=>$request->lat,'long'=>$request->long,'place'=>$request->location,'punch_time'=>$time,'punch_date'=>$request->attend_date,'member_code'=>trim($request->member_code)]);
-            curl_close($curlHandle);
-            $x=['punch_in'=>$time,'date' => $request->attend_date];
+            // $lastId=Attendance::create($postParameter)->id;
+            // Photo::create(['user_id' => $request->user_id,'attendance_id'=>$lastId,'punch_type'=>'I','photo_name'=>$input['file'],'lat'=>$request->lat,'long'=>$request->long,'place'=>$request->location,'punch_time'=>$time,'punch_date'=>$request->attend_date,'member_code'=>trim($request->member_code)]);
+            // curl_close($curlHandle);
+            // $x=['punch_in'=>$time,'date' => $request->attend_date];
             DB::commit();
             return Response(['message' => 'inserted successfully','status'=>1,'data'=>$x],200);
 
@@ -263,22 +476,14 @@ class AttendanceController extends Controller
             
             foreach($request->details as $x){
               
-                //return Response(['message' => 'inserted successfully','status'=>1,'data11'=>$request->details],200);
-                 //$x=json_encode($x);
-                //return Response(['message' => 'inserted successfully vvv','status'=>1,'data11'=>$x->member_code],200);
+                
 
                     if(str_starts_with($x['member_code'], 'AF')){
                     $member_type='student';
                     }else{
                     $member_type='staff';
                     }
-                    // if($x['attend_date']<date('Y-m-d')){
-                    //     //$time=$request->punch_time==''?date('H:i:s'):$request->punch_time;
-                    //     $attn_type='past';
-                    // }else{
-                    //     $time=date('H:i:s');
-                    //     $attn_type='present';
-                    // }
+                    
                     $attn_type=$x['attn_type'];
                     
                     $details1 = Attendance::where('atten_date', $x['attend_date'])->where('user_id', $x['user_id'])->get();
@@ -323,34 +528,10 @@ class AttendanceController extends Controller
                     }    
                     //$attn_type='present';
                     $postParameter = ['user_id' => $x['user_id'],'atten_date' => $x['attend_date'],'punch_in'=>$x['punch_in'],'punch_out'=>$x['punch_out'],'lat'=>$x['lat'],'long'=>$x['long'],'member_id'=>$x['member_id'],'member_code'=>$x['member_code'],'status'=>2,'transfer_status'=>1,'atten_type'=>$attn_type,'member_type'=>$member_type,'punch_in_place'=>'','reason'=>$x['reason'],'center_id'=>$x['center_id'],'photo'=>$input['file'],'batch_id'=>$x['batch_id'],'batch_code'=>$x['batch_code'],'bulk_type'=>0,'app_version'=>$request->app_version];
-                    // if(sizeof($details)>0){
-                    //     //dd($details[0]->id);
-                    //     $curlHandle = curl_init('https://cmis3api.anudip.org/api/insertFromAttenApp');
-                    //     curl_setopt($curlHandle, CURLOPT_POSTFIELDS, $postParameter);
-                    //     curl_setopt($curlHandle, CURLOPT_RETURNTRANSFER, true);
-                    //     $curlResponse = curl_exec($curlHandle);
-                    //     //dd($curlResponse);
-                    //     curl_close($curlHandle);
-                    //     Attendance::where('atten_date', $x->attend_date)->where('user_id', $details[0]->user_id)->update(['punch_out'=>$time,'punch_out_lat'=>$x->lat,'punch_out_long'=>$x->long,'status'=>0,'punch_out_place'=>$x->location]);
-
-                    //     Photo::create(['user_id' => $x->user_id,'attendance_id'=>$details[0]->id,'punch_type'=>'O','photo_name'=>$input['file'],'lat'=>$x->lat,'long'=>$x->long,'place'=>$x->location,'punch_time'=>$time,'punch_date'=>$x->attend_date,'member_code'=>trim($x->member_code)]);
-
-                    //     $x=['punch_out'=>$time,'date' => $x->attend_date,'punch_in'=>$details[0]->punch_in];
-                    //     DB::commit();
-                    //         return Response(['message' => 'updated successfully','status'=>1,'data'=>$x],200);
-                    // }
-                    //code for update end
-                    
-                    // $curlHandle = curl_init('https://cmis3api.anudip.org/api/insertFromAttenApp');
-                    // curl_setopt($curlHandle, CURLOPT_POSTFIELDS, $postParameter);
-                    // curl_setopt($curlHandle, CURLOPT_RETURNTRANSFER, true);
-                    // $curlResponse = curl_exec($curlHandle);
-                    
-                    
-                   
                      
                     if($x['punch_out']==null){
                         //dd('k');
+                        
                         Attendance::where('atten_date', $x['attend_date'])->where('user_id', $x['user_id'])->delete();
                         $lastId=Attendance::create($postParameter)->id;
                         Photo::create(['user_id' => $x['user_id'],'attendance_id'=>$lastId,'punch_type'=>'I','photo_name'=>$input['file'],'lat'=>$x['lat'],'long'=>$x['long'],'place'=>'','punch_time'=>$x['punch_in'],'punch_date'=>$x['attend_date'],'member_code'=>trim($x['member_code'])]);
@@ -476,6 +657,217 @@ class AttendanceController extends Controller
                             
                         }
                     }
+
+                    // $incount = Attendance::where('atten_date', $x->attend_date)->where('user_id', $request->user_id)->count();
+
+                    // if($incount==0){
+
+                    //     // $members=DB::connection('mysql_2')->table('members')->where('id',$member_id)->get(['member_code','first_name','last_name','email_id','mobile_no','gender']);
+
+                    //     $users=DB::table('users')->where('member_id', $member_id)->get(['id','member_code']);
+                    //     $user_id= $users[0]->id;
+
+                    //     $atten_type=$request->attend_date==date('Y-m-d')?'present':'past';
+                    //     if(str_starts_with($users[0]->member_code, 'AF')){
+                    //         $member_type='student';
+                    //     }else{
+                    //         $member_type='staff';
+                    //     }
+
+                        
+
+                    //     $lastId=DB::table('attendances')->insertGetId([
+                    //         'user_id'         => $user_id,
+                    //         'atten_date'      => $request->attend_date,
+                    //         'punch_in'        => $time,
+                    //         'lat'             => $request->lat,
+                    //         'long'            => $request->long,
+                    //         'member_id'       => $member_id,
+                    //         'member_code'     => $users[0]->member_code,
+                    //         'member_type'     => $member_type,
+                    //         'transfer_status' => 1,
+                    //         'atten_type'      => $attn_type,
+                    //         'status'          => 2,
+                    //         'atten_image'     => $input['file'],
+                    //         'punch_in_place'  => $request->location,
+                    //         'reason'          => $request->reason,
+                    //         'bulk_type'       => 0,
+                    //         'app_version'     => $request->app_version,
+                    //         'created_at'      => now(),
+                    //         'updated_at'      => now(),
+                    //     ]);
+                        
+
+                    //     Photo::create(['user_id' => $user_id,'attendance_id'=>$lastId,'punch_type'=>'I','photo_name'=>$input['file'],'lat'=>$request->lat,'long'=>$request->long,'place'=>$request->location,'punch_time'=>$time,'punch_date'=>$request->attend_date,'member_code'=>trim($users[0]->member_code)]);
+                        
+                    //     $mob_id=DB::connection('mysql_2')->table('attendance_app')->insertGetId([
+                    //         'user_id_mob_app' => $user_id,
+                    //         'atten_date' => $request->attend_date,
+                    //         'punch_time' => $time,
+                    //         'lat' => $request->lat,
+                    //         'long' => $request->long,
+                    //         'member_id' => $member_id,
+                    //         'member_code' => $users[0]->member_code,
+                    //         'status' => 1,
+                    //         'punch_place' => $request->location,
+                    //         'atten_type' => $atten_type,
+                    //         'member_type' => $member_type,
+                    //         'reason' => $request->reason,
+                    //         'center_id' => $request->center_id,///
+                    //         'punch_type' =>"I",
+                    //         'photo' => $input['file'],
+                    //         'batch_code' => $request->batch_code,/////
+                    //         'update_attn_status' => 1,
+                    //         'bulk_type' => 1,
+                    //     ]);
+
+                    //     $insertGetBatchId = DB::connection('mysql_2')->table('attendance_records')->insertGetId(
+                    //         array(
+                    //             'source' => 'mobile_trainer',
+                    //             'mobile_app_id' => $mob_id,
+                    //             'member_id'=>$member_id,
+                    //             'member_type'=>'student',
+                    //             'punch_type'=>"I",
+                    //             'flag_value'=>1,
+                    //             'punch_time'=>$request->attend_date." ".$time,
+                    //             'onetime'=>1,
+                    //             'created_at'=>now(),
+                    //             'attd_month'=>'All',
+                    //         )
+                    //     );
+                        
+                        
+                        
+
+                    // }else{
+
+                    //     $users=DB::table('users')->where('member_id', $member_id)->get(['id','member_code']);
+                    //     $user_id= $users[0]->id;
+
+                    //     $atten_type=$request->attend_date==date('Y-m-d')?'present':'past';
+                    //     if(str_starts_with($users[0]->member_code, 'AF')){
+                    //         $member_type='student';
+                    //     }else{
+                    //         $member_type='staff';
+                    //     }
+
+                    //     $studenttime=Attendance::where('atten_date',$request->attend_date)->where('user_id',$user_id)->get(['punch_in','punch_out']);
+
+                    //     if($studenttime[0]->punch_in<$time){
+                    //         Attendance::where('atten_date', $request->attend_date)->where('user_id', $user_id)->update(['punch_in'=>$time,'status'=>1,'punch_out_place'=>$request->location]);
+                    //     }else{
+                    //         // Attendance::where('atten_date', $request->attend_date)->where('user_id', $user_id)->update(['punch_out'=>$time,'status'=>1,'punch_out_place'=>$request->location]);
+
+                    //         $checkOutTime=Attendance::where('member_id',$user_id)->where('atten_date',$request->attend_date)->where('punch_type',"O")->value('punch_time');
+
+                    //         if($time>$checkOutTime){
+
+                    //             Attendance::where('atten_date', $request->attend_date)->where('user_id', $user_id)->update(['punch_out'=>$time,'status'=>1]);
+                    //         }
+                    //     }
+
+                        
+
+                    //     $details = Attendance::where('atten_date', $request->attend_date)->where('user_id', $user_id)->get();
+
+                    //     Photo::create(['user_id' => $user_id,'attendance_id'=>$details[0]->id,'punch_type'=>'O','photo_name'=>$input['file'],'lat'=>$request->lat,'long'=>$request->long,'place'=>$request->location,'punch_time'=>$time,'punch_date'=>$request->attend_date,'member_code'=>trim($users[0]->member_code)]);
+
+                    //     $checkInTime=DB::connection('mysql_2')->table('attendance_app')->where('member_id',$member_id)->where('atten_date',$request->attend_date)->where('punch_type','I')->value('punch_time');
+
+                    //     if($checkInTime>$time){
+                    //         $checkInTime=DB::connection('mysql_2')->table('attendance_app')->where('member_id',$member_id)->where('atten_date',$request->attend_date)->where('punch_type','I')->update(['punch_time' =>$time]);
+                    //     }else{
+
+                    //         $checkOutTime=DB::connection('mysql_2')->table('attendance_app')->where('member_id',$member_id)->where('atten_date',$request->attend_date)->where('punch_type',"O")->value('punch_time');
+                    //         if($time>$checkOutTime){
+                    //             DB::connection('mysql_2')->table('attendance_app')->updateOrInsert([
+                    //                 'member_id'=>$member_id,
+                    //                 'atten_date'=>$request->attend_date,
+                    //                 'punch_type'=>"O"
+                    //             ],[
+                                
+                    //                 'punch_time' => $time,
+                                    
+                    //             ]);
+                    //         }else{
+
+                    //             $mob_id=DB::connection('mysql_2')->table('attendance_app')->insertGetId([
+                    //                 'user_id_mob_app' => $user_id,
+                    //                 'atten_date' => $request->attend_date,
+                    //                 'punch_time' => $time,
+                    //                 'lat' => $request->lat,
+                    //                 'long' => $request->long,
+                    //                 'member_id' => $member_id,
+                    //                 'member_code' => $users[0]->member_code,
+                    //                 'status' => 2,
+                    //                 'punch_place' => $request->location,
+                    //                 'atten_type' => $atten_type,
+                    //                 'member_type' => $member_type,
+                    //                 'reason' => $request->reason,
+                    //                 'center_id' => $request->center_id,
+                    //                 'punch_type' =>"O",
+                    //                 'photo' => $input['file'],
+                    //                 'batch_code' => $request->batch_code,
+                    //                 'update_attn_status' => 1,
+                    //             ]);
+                    //             $mobile_id=$mob_id;
+
+                    //         }
+
+                    //     }
+                        
+                    //     // $mob_id=DB::connection('mysql_2')->table('attendance_app')->where('member_id',$member_id)->where('atten_date',$request->attend_date)->where('punch_type',"O")->get(['id']);
+                        
+                    //     // if(sizeof($mob_id)>0){
+                    //     //     $mobile_id=$mob_id[0]->id;
+                    //     //     DB::connection('mysql_2')->table('attendance_app')->updateOrInsert([
+                    //     //         'id' => $mob_id[0]->id,
+                    //     //     ],[
+                    //     //         'user_id_mob_app' => $user_id,
+                    //     //         'atten_date' => $request->attend_date,
+                    //     //         'punch_time' => $time,
+                    //     //         'lat' => $request->lat,
+                    //     //         'long' => $request->long,
+                    //     //         'member_id' => $member_id,
+                    //     //         'member_code' => $users[0]->member_code,
+                    //     //         'status' => 1,
+                    //     //         'punch_place' => $request->location,
+                    //     //         'atten_type' => $atten_type,
+                    //     //         'member_type' => $member_type,
+                    //     //         'reason' => $request->reason,
+                    //     //         'center_id' => $request->center_id,
+                    //     //         'punch_type' =>"O",
+                    //     //         'photo' => $input['file'],
+                    //     //         'batch_code' => $request->batch_code,
+                    //     //         'update_attn_status' => 1,
+                    //     //         'bulk_type' => 1,
+                    //     //         'approve_by' => $trainer_id,
+                    //     //         'approve_at' => now(),
+                    //     //     ]);
+                    //     //     //dd($mob_id);
+                            
+                    //     // }else{
+                    //         $mob_id=DB::connection('mysql_2')->table('attendance_app')->insertGetId([
+                    //             'user_id_mob_app' => $user_id,
+                    //             'atten_date' => $request->attend_date,
+                    //             'punch_time' => $time,
+                    //             'lat' => $request->lat,
+                    //             'long' => $request->long,
+                    //             'member_id' => $member_id,
+                    //             'member_code' => $users[0]->member_code,
+                    //             'status' => 2,
+                    //             'punch_place' => $request->location,
+                    //             'atten_type' => $atten_type,
+                    //             'member_type' => $member_type,
+                    //             'reason' => $request->reason,
+                    //             'center_id' => $request->center_id,
+                    //             'punch_type' =>"O",
+                    //             'photo' => $input['file'],
+                    //             'batch_code' => $request->batch_code,
+                    //             'update_attn_status' => 1,
+                    //         ]);
+                    //         $mobile_id=$mob_id;
+                    // }
 
                     
                     //curl_close($curlHandle);
@@ -928,41 +1320,23 @@ class AttendanceController extends Controller
                                 if($studenttime[0]->punch_in<$time){
                                     Attendance::where('atten_date', $x['attend_date'])->where('user_id', $user_id)->update(['punch_in'=>$time,'status'=>1]);
                                 }else{
-                                    Attendance::where('atten_date', $x['attend_date'])->where('user_id', $user_id)->update(['punch_out'=>$time,'status'=>1]);
+                                    $checkOutTime=Attendance::where('member_id',$member_id)->where('atten_date',$x['attend_date'])->where('punch_type',"O")->value('punch_time');
+
+                                    if($time>$checkOutTime){
+
+                                        Attendance::where('atten_date', $x['attend_date'])->where('user_id', $user_id)->update(['punch_out'=>$time,'status'=>1]);
+                                    }
                                 }
                                 
                                 $details = Attendance::where('atten_date', $x['attend_date'])->where('user_id', $user_id)->get();
             
                                 Photo::create(['user_id' => $user_id,'attendance_id'=>$details[0]->id,'punch_type'=>'O','photo_name'=>$input['file'],'lat'=>$x['lat'],'long'=>$x['long'],'punch_time'=>$time,'punch_date'=>$x['attend_date'],'member_code'=>trim($users[0]->member_code)]);
 
-                                $checkInTime=DB::connection('mysql_2')->table('attendance_app')->where('member_id',$member_id)->where('atten_date',$x['attend_date'])->where('punch_time','<',$time)->count();
+                                $checkInTime=DB::connection('mysql_2')->table('attendance_app')->where('member_id',$member_id)->where('atten_date',$x['attend_date'])->where('punch_type','I')->value('punch_time');
 
-                                if($checkInTime==0){
+                                if($checkInTime>$time){
 
-                                    $mob_id=DB::connection('mysql_2')->table('attendance_app')->insertGetId([
-                                        'user_id_mob_app' => $user_id,
-                                        'atten_date' => $x['attend_date'],
-                                        'punch_time' => $time,
-                                        'lat' => $x['lat'],
-                                        'long' => $x['long'],
-                                        'member_id' => $member_id,
-                                        'member_code' => $users[0]->member_code,
-                                        'status' => 1,
-                                        'atten_type' => $atten_type,
-                                        'member_type' => $member_type,
-                                        'reason' => $x['reason'],
-                                        'center_id' => $x['center_id'],
-                                        'punch_type' =>"I",
-                                        'photo' => $input['file'],
-                                        'batch_code' => $x['batch_code'],
-                                        'update_attn_status' => 1,
-                                        'bulk_type' => 1,
-                                        'approve_by' => $trainer_id,
-                                        'approve_at' => now(),
-                                    ]);
-                                    $mobile_id=$mob_id;
-
-                                    $checkInTime=DB::connection('mysql_2')->table('attendance_app')->where('member_id',$member_id)->where('atten_date',$x['attend_date'])->where('id','<>',$mob_id)->update(['punch_type' =>"O"]);
+                                    $checkInTime=DB::connection('mysql_2')->table('attendance_app')->where('member_id',$member_id)->where('atten_date',$x['attend_date'])->where('punch_type','I')->update(['punch_time' =>$time]);
 
                                 }else{
                                     $checkOutTime=DB::connection('mysql_2')->table('attendance_app')->where('member_id',$member_id)->where('atten_date',$x['attend_date'])->where('punch_type',"O")->value('punch_time');
