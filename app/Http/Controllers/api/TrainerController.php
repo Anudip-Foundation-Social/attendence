@@ -352,7 +352,7 @@ class TrainerController extends Controller
             foreach($request->studentList as $member_id){
 
                 $incount=Attendance::where('atten_date',$request->attend_date)->where('member_id',$member_id)->count();
-                 dd($incount);
+                 //dd($incount);
                 if($incount==0){
 
                     $members=DB::connection('mysql_2')->table('members')->where('id',$member_id)->get(['member_code','first_name','last_name','email_id','mobile_no','gender']);
@@ -411,7 +411,7 @@ class TrainerController extends Controller
                         'created_at'      => now(),
                         'updated_at'      => now(),
                     ]);
-                    
+                    dd($lastId);
 
                     Photo::create(['user_id' => $user_id,'attendance_id'=>$lastId,'punch_type'=>'I','photo_name'=>$input['file'],'lat'=>$request->lat,'long'=>$request->long,'place'=>$request->location,'punch_time'=>$time,'punch_date'=>$request->attend_date,'member_code'=>trim($users[0]->member_code)]);
                     
