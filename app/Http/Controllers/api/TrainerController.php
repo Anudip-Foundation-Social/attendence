@@ -593,6 +593,8 @@ class TrainerController extends Controller
                 }
                     //dd($mobile_id);
 
+                    $mob_id=DB::connection('mysql_2')->table('attendance_app')->where('member_id',$member_id)->where('atten_date',$x['attend_date'])->where('punch_type',"O")->get(['id']);
+
                 $insertGetBatchId = DB::connection('mysql_2')->table('attendance_records')->insertGetId(
                     array(
                         'source' => 'mobile_trainer',
