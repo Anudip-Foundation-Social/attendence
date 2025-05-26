@@ -395,7 +395,7 @@ class AttendanceController extends Controller
             //         ]);
             //         $mobile_id=$mob_id;
             // }
-
+            $details = Attendance::where('atten_date', $request->attend_date)->where('user_id', $request->user_id)->get();
             if(sizeof($details)>0){
                 //dd($details[0]->id);
                 $sts=Attendance::where('atten_date', $request->attend_date)->where('user_id', $details[0]->user_id)->get(['status','punch_out']);
@@ -568,6 +568,7 @@ class AttendanceController extends Controller
                         if(sizeof($details1)>0){
 
                             //if($details1[0]->status!=1 && $details1[0]->status!=3){
+                            $sts=Attendance::where('atten_date', $request->attend_date)->where('user_id', $details[0]->user_id)->get(['status','punch_out']);
                             if(($sts[0]->status != 1 && $sts[0]->status != 3) ||
                             ($sts[0]->status == 1 && $sts[0]->punch_out == null)){
 
