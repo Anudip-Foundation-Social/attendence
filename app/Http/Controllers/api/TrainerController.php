@@ -536,7 +536,7 @@ class TrainerController extends Controller
 
                     }
 
-                    $mob_id=DB::connection('mysql_2')->table('attendance_app')->where('member_id',$member_id)->where('atten_date',$request->attend_date)->where('punch_type',"O")->get(['id']);
+                    $mob_id=DB::connection('mysql_2')->table('attendance_app')->where('member_id',$member_id)->where('atten_date',$request->attend_date)->get(['id']);
                         //dd($mob_id,$member_id,$request->attend_date); 
                     $insertGetBatchId = DB::connection('mysql_2')->table('attendance_records')->insertGetId(
                         array(
