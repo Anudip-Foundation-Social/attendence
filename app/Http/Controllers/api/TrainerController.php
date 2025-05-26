@@ -512,7 +512,7 @@ class TrainerController extends Controller
                                 
                             ]);
                         }else{
-                            dd($user_id,'df');
+                            //dd($user_id,'df');
                             $mob_id=DB::connection('mysql_2')->table('attendance_app')->insertGetId([
                                 'user_id_mob_app' => $user_id,
                                 'atten_date' => $request->attend_date,
