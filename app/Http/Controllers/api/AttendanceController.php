@@ -564,7 +564,7 @@ class AttendanceController extends Controller
 
 
                     }else{
-                        dd($details1);
+                        dd($details1[0]->user_id);
                         if(sizeof($details1)>0){
 
                             //if($details1[0]->status!=1 && $details1[0]->status!=3){
