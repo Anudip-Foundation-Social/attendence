@@ -298,9 +298,9 @@ class AttendanceController extends Controller
 
                 if($time<$studenttime[0]->punch_in){
                     //dd("dd",$user_id);
-                    if($studenttime[0]->bulk_type!=1 && $studenttime[0]->status!=1){
+                    //if($studenttime[0]->bulk_type!=1 && $studenttime[0]->status!=1){
                       Attendance::where('atten_date', $request->attend_date)->where('user_id', $user_id)->update(['punch_in'=>$time,'punch_out_place'=>$request->location]);
-                    }
+                    //}
                 }else{
                     
                     // Attendance::where('atten_date', $request->attend_date)->where('user_id', $user_id)->update(['punch_out'=>$time,'status'=>1,'punch_out_place'=>$request->location]);
