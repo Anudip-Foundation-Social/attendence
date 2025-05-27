@@ -248,6 +248,21 @@ class AttendanceController extends Controller
                     'bulk_type' => 0,
                 ]);
 
+                $insertGetBatchId = DB::connection('mysql_2')->table('attendance_records')->insertGetId(
+                    array(
+                        'source' => 'mobile_student',
+                        'mobile_app_id' => $mob_id,
+                        'member_id'=>$member_id,
+                        'member_type'=>'student',
+                        'punch_type'=>"I",
+                        'flag_value'=>1,
+                        'punch_time'=>$request->attend_date." ".$time,
+                        'onetime'=>1,
+                        'created_at'=>now(),
+                        'attd_month'=>'All',
+                    )
+                );
+
                 // $insertGetBatchId = DB::connection('mysql_2')->table('attendance_records')->insertGetId(
                 //     array(
                 //         'source' => 'mobile_trainer',
@@ -335,6 +350,23 @@ class AttendanceController extends Controller
                             'batch_code' => $request->batch_code,
                             'update_attn_status' => 1,
                         ]);
+
+                        $mob_id=DB::connection('mysql_2')->table('attendance_app')->where('member_id',$member_id)->where('atten_date',$request->attend_date)->value('id');
+
+                        $insertGetBatchId = DB::connection('mysql_2')->table('attendance_records')->insertGetId(
+                            array(
+                                'source' => 'mobile_student',
+                                'mobile_app_id' => $mob_id,
+                                'member_id'=>$member_id,
+                                'member_type'=>'student',
+                                'punch_type'=>"I",
+                                'flag_value'=>1,
+                                'punch_time'=>$request->attend_date." ".$time,
+                                'onetime'=>1,
+                                'created_at'=>now(),
+                                'attd_month'=>'All',
+                            )
+                        );
                     }
                     // else{
                         
