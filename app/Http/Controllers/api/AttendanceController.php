@@ -752,6 +752,12 @@ class AttendanceController extends Controller
                     //     }
                     // }
 
+                    if($x['punch_out']==''){
+                      $time=$x['punch_in'];
+                    }else{
+                        $time=$x['punch_out'];
+                    }
+
                     $incount = Attendance::where('atten_date', $x['attend_date'])->where('user_id', $x['user_id'])->count();
 
                     if($incount==0){
