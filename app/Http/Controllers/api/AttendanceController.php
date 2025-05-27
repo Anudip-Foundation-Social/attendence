@@ -307,8 +307,9 @@ class AttendanceController extends Controller
                 if($checkInTime>$time){
                     $checkInTime=DB::connection('mysql_2')->table('attendance_app')->where('member_id',$member_id)->where('atten_date',$request->attend_date)->where('punch_type','I')->update(['punch_time' =>$time]);
                 }else{
-                     dd($user_id);
+                     
                     $checkOutTime=DB::connection('mysql_2')->table('attendance_app')->where('member_id',$member_id)->where('atten_date',$request->attend_date)->where('punch_type',"O")->value('punch_time');
+                    dd($checkOutTime,$user_id);
                     if($time>$checkOutTime){
                         DB::connection('mysql_2')->table('attendance_app')->updateOrInsert([
                             'member_id'=>$member_id,
