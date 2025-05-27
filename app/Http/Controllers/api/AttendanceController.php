@@ -303,11 +303,11 @@ class AttendanceController extends Controller
                 Photo::create(['user_id' => $user_id,'attendance_id'=>$details[0]->id,'punch_type'=>'O','photo_name'=>$input['file'],'lat'=>$request->lat,'long'=>$request->long,'place'=>$request->location,'punch_time'=>$time,'punch_date'=>$request->attend_date,'member_code'=>trim($users[0]->member_code)]);
 
                 $checkInTime=DB::connection('mysql_2')->table('attendance_app')->where('member_id',$member_id)->where('atten_date',$request->attend_date)->where('punch_type','I')->value('punch_time');
-                dd($checkInTime,$user_id);
+                //dd($checkInTime,$user_id);
                 if($checkInTime>$time){
                     $checkInTime=DB::connection('mysql_2')->table('attendance_app')->where('member_id',$member_id)->where('atten_date',$request->attend_date)->where('punch_type','I')->update(['punch_time' =>$time]);
                 }else{
-
+                     dd($user_id);
                     $checkOutTime=DB::connection('mysql_2')->table('attendance_app')->where('member_id',$member_id)->where('atten_date',$request->attend_date)->where('punch_type',"O")->value('punch_time');
                     if($time>$checkOutTime){
                         DB::connection('mysql_2')->table('attendance_app')->updateOrInsert([
