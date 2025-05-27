@@ -267,6 +267,7 @@ class AttendanceController extends Controller
                 
 
             }else{
+                dd($incount);
 
                 $users=DB::table('users')->where('member_id', $member_id)->get(['id','member_code']);
                 $user_id= $request->user_id;
@@ -281,7 +282,7 @@ class AttendanceController extends Controller
                 $studenttime=Attendance::where('atten_date',$request->attend_date)->where('user_id',$user_id)->get(['punch_in','punch_out']);
 
                 if($time<$studenttime[0]->punch_in){
-                    Attendance::where('atten_date', $request->attend_date)->where('user_id', $user_id)->update(['punch_in'=>$time,'status'=>1,'punch_out_place'=>$request->location]);
+                    Attendance::where('atten_date', $request->attend_date)->where('user_id', $user_id)->update(['punch_in'=>$time,'punch_out_place'=>$request->location]);
                 }else{
                     // Attendance::where('atten_date', $request->attend_date)->where('user_id', $user_id)->update(['punch_out'=>$time,'status'=>1,'punch_out_place'=>$request->location]);
 
@@ -289,7 +290,7 @@ class AttendanceController extends Controller
 
                     if($time>$checkOutTime){
 
-                        Attendance::where('atten_date', $request->attend_date)->where('user_id', $user_id)->update(['punch_out'=>$time,'status'=>1]);
+                        Attendance::where('atten_date', $request->attend_date)->where('user_id', $user_id)->update(['punch_out'=>$time,'status'=>0]);
                     }
                 }
 
