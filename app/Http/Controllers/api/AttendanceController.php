@@ -271,7 +271,7 @@ class AttendanceController extends Controller
 
                 $users=DB::table('users')->where('member_id', $member_id)->get(['id','member_code']);
                 $user_id= $request->user_id;
-                //dd($user_id);
+                dd($user_id);
                 $atten_type=$request->attend_date==date('Y-m-d')?'present':'past';
                 if(str_starts_with($request->member_code, 'AF')){
                     $member_type='student';
