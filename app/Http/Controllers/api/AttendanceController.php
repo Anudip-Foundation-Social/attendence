@@ -322,7 +322,25 @@ class AttendanceController extends Controller
                             
                         ]);
                     }else{
-                        dd("ssaa",$user_id);
+                        dd("ssaa",[
+                            'user_id_mob_app' => $user_id,
+                            'atten_date' => $request->attend_date,
+                            'punch_time' => $time,
+                            'lat' => $request->lat,
+                            'long' => $request->long,
+                            'member_id' => $member_id,
+                            'member_code' => $users[0]->member_code,
+                            'status' => 2,
+                            'punch_place' => $request->location,
+                            'atten_type' => $atten_type,
+                            'member_type' => $member_type,
+                            'reason' => $request->reason,
+                            'center_id' => $request->center_id,
+                            'punch_type' =>"O",
+                            'photo' => $input['file'],
+                            'batch_code' => $request->batch_code,
+                            'update_attn_status' => 1,
+                        ]);
                         $mob_id=DB::connection('mysql_2')->table('attendance_app')->insertGetId([
                             'user_id_mob_app' => $user_id,
                             'atten_date' => $request->attend_date,
