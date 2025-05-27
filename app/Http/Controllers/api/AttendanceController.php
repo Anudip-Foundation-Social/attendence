@@ -309,8 +309,9 @@ class AttendanceController extends Controller
                 }else{
                      
                     $checkOutTime=DB::connection('mysql_2')->table('attendance_app')->where('member_id',$member_id)->where('atten_date',$request->attend_date)->where('punch_type',"O")->value('punch_time');
-                    dd($checkOutTime,$user_id);
+                   
                     if($time>$checkOutTime){
+                        dd("ss",$user_id);
                         DB::connection('mysql_2')->table('attendance_app')->updateOrInsert([
                             'member_id'=>$member_id,
                             'atten_date'=>$request->attend_date,
@@ -321,7 +322,7 @@ class AttendanceController extends Controller
                             
                         ]);
                     }else{
-
+                        dd("ssaa",$user_id);
                         $mob_id=DB::connection('mysql_2')->table('attendance_app')->insertGetId([
                             'user_id_mob_app' => $user_id,
                             'atten_date' => $request->attend_date,
