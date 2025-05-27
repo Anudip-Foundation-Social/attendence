@@ -303,7 +303,7 @@ class AttendanceController extends Controller
                     
                     // Attendance::where('atten_date', $request->attend_date)->where('user_id', $user_id)->update(['punch_out'=>$time,'status'=>1,'punch_out_place'=>$request->location]);
 
-                    $checkOutTime=Attendance::where('member_id',$user_id)->where('atten_date',$request->attend_date)->value('punch_out');
+                    $checkOutTime=Attendance::where('user_id',$user_id)->where('atten_date',$request->attend_date)->value('punch_out');
 
                     if($time>$checkOutTime){
 
@@ -873,7 +873,7 @@ class AttendanceController extends Controller
                         }else{
                             // Attendance::where('atten_date', $x['attend_date'])->where('user_id', $user_id)->update(['punch_out'=>$time,'status'=>1,'punch_out_place'=>$x['location']]);
 
-                            $checkOutTime=Attendance::where('member_id',$user_id)->where('atten_date',$x['attend_date'])->value('punch_out');
+                            $checkOutTime=Attendance::where('user_id',$user_id)->where('atten_date',$x['attend_date'])->value('punch_out');
 
                             if($time>$checkOutTime){
 
