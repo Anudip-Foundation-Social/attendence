@@ -296,10 +296,10 @@ class AttendanceController extends Controller
                     }
                 }
 
-                dd("ddxx",$user_id);
+                
 
                 $details = Attendance::where('atten_date', $request->attend_date)->where('user_id', $user_id)->get();
-
+                dd($details,$user_id);
                 Photo::create(['user_id' => $user_id,'attendance_id'=>$details[0]->id,'punch_type'=>'O','photo_name'=>$input['file'],'lat'=>$request->lat,'long'=>$request->long,'place'=>$request->location,'punch_time'=>$time,'punch_date'=>$request->attend_date,'member_code'=>trim($users[0]->member_code)]);
 
                 $checkInTime=DB::connection('mysql_2')->table('attendance_app')->where('member_id',$member_id)->where('atten_date',$request->attend_date)->where('punch_type','I')->value('punch_time');
