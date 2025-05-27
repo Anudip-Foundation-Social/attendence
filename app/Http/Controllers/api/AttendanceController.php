@@ -545,7 +545,8 @@ class AttendanceController extends Controller
             // $lastId=Attendance::create($postParameter)->id;
             // Photo::create(['user_id' => $request->user_id,'attendance_id'=>$lastId,'punch_type'=>'I','photo_name'=>$input['file'],'lat'=>$request->lat,'long'=>$request->long,'place'=>$request->location,'punch_time'=>$time,'punch_date'=>$request->attend_date,'member_code'=>trim($request->member_code)]);
             // curl_close($curlHandle);
-            $x=['punch_in'=>$time,'date' => $request->attend_date];
+            $punch = Attendance::where('atten_date', $request->attend_date)->where('user_id', $request->user_id)->get();
+            $x=['punch_in'=>$punch[0]->punch_in,'punch_out'=>$punch[0]->punch_out,'date' => $request->attend_date];
             DB::commit();
             return Response(['message' => 'inserted successfully','status'=>1,'data'=>$x],200);
 
