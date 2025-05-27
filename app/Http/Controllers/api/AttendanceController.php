@@ -809,7 +809,7 @@ class AttendanceController extends Controller
                             'member_id' => $member_id,
                             'member_code' => $x['member_code'],
                             'status' => 2,
-                            'punch_place' => $x['location'],
+                            'punch_place' => 'demo',
                             'atten_type' => $atten_type,
                             'member_type' => $member_type,
                             'reason' => $x['reason'],
