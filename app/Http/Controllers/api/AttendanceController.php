@@ -891,6 +891,23 @@ class AttendanceController extends Controller
 
                         if($checkInTime>$time){
                             $checkInTime=DB::connection('mysql_2')->table('attendance_app')->where('member_id',$member_id)->where('atten_date',$x['attend_date'])->where('punch_type','I')->update(['punch_time' =>$time]);
+
+                            $mob_id=DB::connection('mysql_2')->table('attendance_app')->where('member_id',$member_id)->where('atten_date',$x['attend_date'])->value('id');
+
+                            $insertGetBatchId = DB::connection('mysql_2')->table('attendance_records')->insertGetId(
+                                array(
+                                    'source' => 'mobile_student',
+                                    'mobile_app_id' => $mob_id,
+                                    'member_id'=>$member_id,
+                                    'member_type'=>'student',
+                                    'punch_type'=>"I",
+                                    'flag_value'=>1,
+                                    'punch_time'=>$x['attend_date']." ".$time,
+                                    'onetime'=>1,
+                                    'created_at'=>now(),
+                                    'attd_month'=>'All',
+                                )
+                            );
                         }else{
 
                             $checkOutTime=DB::connection('mysql_2')->table('attendance_app')->where('member_id',$member_id)->where('atten_date',$x['attend_date'])->where('punch_type',"O")->value('punch_time');
