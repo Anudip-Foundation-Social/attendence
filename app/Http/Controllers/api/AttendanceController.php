@@ -815,6 +815,21 @@ class AttendanceController extends Controller
                             'bulk_type' => 0,
                         ]);
 
+                        $insertGetBatchId = DB::connection('mysql_2')->table('attendance_records')->insertGetId(
+                            array(
+                                'source' => 'mobile_student',
+                                'mobile_app_id' => $mob_id,
+                                'member_id'=>$member_id,
+                                'member_type'=>'student',
+                                'punch_type'=>"O",
+                                'flag_value'=>1,
+                                'punch_time'=>$x['attend_date']." ".$time,
+                                'onetime'=>1,
+                                'created_at'=>now(),
+                                'attd_month'=>'All',
+                            )
+                        );
+
                         // $insertGetBatchId = DB::connection('mysql_2')->table('attendance_records')->insertGetId(
                         //     array(
                         //         'source' => 'mobile_trainer',
@@ -856,7 +871,7 @@ class AttendanceController extends Controller
 
                             if($time>$checkOutTime){
 
-                                Attendance::where('atten_date', $x['attend_date'])->where('user_id', $user_id)->update(['punch_out'=>$time,'status'=>1]);
+                                Attendance::where('atten_date', $x['attend_date'])->where('user_id', $user_id)->update(['punch_out'=>$time,'status'=>0,'punch_out_lat'=>$x['lat'],'punch_out_long'=>$x['long']]);
                             }
                         }
 
@@ -881,11 +896,6 @@ class AttendanceController extends Controller
                                 ],[
                                 
                                     'punch_time' => $time,
-                                    
-                                ]);
-                            }else{
-
-                                $mob_id=DB::connection('mysql_2')->table('attendance_app')->insertGetId([
                                     'user_id_mob_app' => $user_id,
                                     'atten_date' => $x['attend_date'],
                                     'punch_time' => $time,
@@ -903,10 +913,50 @@ class AttendanceController extends Controller
                                     'photo' => $input['file'],
                                     'batch_code' => $x['batch_code'],
                                     'update_attn_status' => 1,
+                                    
                                 ]);
-                                $mobile_id=$mob_id;
 
+                                $mob_id=DB::connection('mysql_2')->table('attendance_app')->where('member_id',$member_id)->where('atten_date',$x['attend_date'])->value('id');
+
+                                $insertGetBatchId = DB::connection('mysql_2')->table('attendance_records')->insertGetId(
+                                    array(
+                                        'source' => 'mobile_student',
+                                        'mobile_app_id' => $mob_id,
+                                        'member_id'=>$member_id,
+                                        'member_type'=>'student',
+                                        'punch_type'=>"O",
+                                        'flag_value'=>1,
+                                        'punch_time'=>$x['attend_date']." ".$time,
+                                        'onetime'=>1,
+                                        'created_at'=>now(),
+                                        'attd_month'=>'All',
+                                    )
+                                );
                             }
+                            // else{
+
+                            //     $mob_id=DB::connection('mysql_2')->table('attendance_app')->insertGetId([
+                            //         'user_id_mob_app' => $user_id,
+                            //         'atten_date' => $x['attend_date'],
+                            //         'punch_time' => $time,
+                            //         'lat' => $x['lat'],
+                            //         'long' => $x['long'],
+                            //         'member_id' => $member_id,
+                            //         'member_code' => $users[0]->member_code,
+                            //         'status' => 2,
+                            //         'punch_place' => $x['location'],
+                            //         'atten_type' => $atten_type,
+                            //         'member_type' => $member_type,
+                            //         'reason' => $x['reason'],
+                            //         'center_id' => $x['center_id'],
+                            //         'punch_type' =>"O",
+                            //         'photo' => $input['file'],
+                            //         'batch_code' => $x['batch_code'],
+                            //         'update_attn_status' => 1,
+                            //     ]);
+                            //     $mobile_id=$mob_id;
+
+                            // }
 
                         }
                         
