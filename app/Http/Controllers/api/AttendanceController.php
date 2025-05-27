@@ -792,7 +792,7 @@ class AttendanceController extends Controller
                             'punch_in_place'  => 'demo',
                             'reason'          => $x['reason'],
                             'bulk_type'       => 0,
-                            'app_version'     => $x['app_version'],
+                            'app_version'     => '1.0.1 (5)',
                             'created_at'      => now(),
                             'updated_at'      => now(),
                         ]);
