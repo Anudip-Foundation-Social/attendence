@@ -573,7 +573,7 @@ class AttendanceController extends Controller
                     }else{
                     $member_type='staff';
                     }
-                    
+                    $member_id=$x['member_id'];
                     $attn_type=$x['attn_type'];
                     
                     $details1 = Attendance::where('atten_date', $x['attend_date'])->where('user_id', $x['user_id'])->get();
