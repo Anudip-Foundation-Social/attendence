@@ -789,7 +789,7 @@ class AttendanceController extends Controller
                             'atten_type'      => $attn_type,
                             'status'          => 2,
                             'atten_image'     => $input['file'],
-                            'punch_in_place'  => $x['location'],
+                            'punch_in_place'  => 'demo',
                             'reason'          => $x['reason'],
                             'bulk_type'       => 0,
                             'app_version'     => $x['app_version'],
