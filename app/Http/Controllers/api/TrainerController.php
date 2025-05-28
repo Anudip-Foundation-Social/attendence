@@ -85,6 +85,7 @@ class TrainerController extends Controller
                   ->leftJoin('members as m', 'e.member_id', '=', 'm.id')
                   ->where('e.batch_id', $batch_id)
                   ->where('e.status', 'enrolled')
+                  ->orderBy('m.first_name')
                   ->get(['m.first_name as first_name','m.last_name as last_name','m.member_code as member_code','m.id as member_id']);
         foreach($members as $m){
             $x=Attendance::where('member_id',$m->member_id)->where('atten_date',date('Y-m-d'))->get(['punch_in','punch_out']);
