@@ -804,7 +804,7 @@ class AttendanceController extends Controller
                             'atten_type'      => $attn_type,
                             'status'          => 2,
                             'atten_image'     => $input['file'],
-                            'punch_in_place'  => 'demo',
+                            'punch_in_place'  => '',
                             'reason'          => $x['reason'],
                             'bulk_type'       => 0,
                             'app_version'     => '1.0.1 (5)',
@@ -813,7 +813,7 @@ class AttendanceController extends Controller
                         ]);
                         
 
-                        Photo::create(['user_id' => $user_id,'attendance_id'=>$lastId,'punch_type'=>'I','photo_name'=>$input['file'],'lat'=>$x['lat'],'long'=>$x['long'],'place'=>'demo','punch_time'=>$time,'punch_date'=>$x['attend_date'],'member_code'=>trim($x['member_code'])]);
+                        Photo::create(['user_id' => $user_id,'attendance_id'=>$lastId,'punch_type'=>'I','photo_name'=>$input['file'],'lat'=>$x['lat'],'long'=>$x['long'],'place'=>'','punch_time'=>$time,'punch_date'=>$x['attend_date'],'member_code'=>trim($x['member_code'])]);
                         
                         $mob_id=DB::connection('mysql_2')->table('attendance_app')->insertGetId([
                             'user_id_mob_app' => $user_id,
@@ -824,7 +824,7 @@ class AttendanceController extends Controller
                             'member_id' => $member_id,
                             'member_code' => $x['member_code'],
                             'status' => 2,
-                            'punch_place' => 'demo',
+                            'punch_place' => '',
                             'atten_type' => $atten_type,
                             'member_type' => $member_type,
                             'reason' => $x['reason'],
@@ -903,7 +903,7 @@ class AttendanceController extends Controller
 
                         $details = Attendance::where('atten_date', $x['attend_date'])->where('user_id', $user_id)->get();
 
-                        Photo::create(['user_id' => $user_id,'attendance_id'=>$details[0]->id,'punch_type'=>'O','photo_name'=>$input['file'],'lat'=>$x['lat'],'long'=>$x['long'],'place'=>'demo','punch_time'=>$time,'punch_date'=>$x['attend_date'],'member_code'=>trim($users[0]->member_code)]);
+                        Photo::create(['user_id' => $user_id,'attendance_id'=>$details[0]->id,'punch_type'=>'O','photo_name'=>$input['file'],'lat'=>$x['lat'],'long'=>$x['long'],'place'=>'','punch_time'=>$time,'punch_date'=>$x['attend_date'],'member_code'=>trim($users[0]->member_code)]);
 
                         $checkInTime=DB::connection('mysql_2')->table('attendance_app')->where('member_id',$member_id)->where('atten_date',$x['attend_date'])->where('punch_type','I')->value('punch_time');
 
