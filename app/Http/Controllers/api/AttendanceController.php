@@ -907,6 +907,7 @@ class AttendanceController extends Controller
 
                         $checkInTime=DB::connection('mysql_2')->table('attendance_app')->where('member_id',$member_id)->where('atten_date',$x['attend_date'])->where('punch_type','I')->value('punch_time');
 
+                        
                        //if($details[0]->bulk_type!=1 && $details[0]->status!=1){
 
                             if($checkInTime>$time){
