@@ -1709,7 +1709,7 @@ class AttendanceController extends Controller
 
                                 if($checkInTime>$time){
 
-                                    $checkInTime=DB::connection('mysql_2')->table('attendance_app')->where('member_id',$member_id)->where('atten_date',$x['attend_date'])->where('punch_type','I')->update(['punch_time' =>$time,'bulk_type'=>0]);
+                                    $checkInTime=DB::connection('mysql_2')->table('attendance_app')->where('member_id',$member_id)->where('atten_date',$x['attend_date'])->where('punch_type','I')->update(['punch_time' =>$time,'bulk_type'=>1]);
 
                                     $mob_id=DB::connection('mysql_2')->table('attendance_app')->where('member_id',$member_id)->where('atten_date',$x['attend_date'])->value('id');
 
@@ -1753,7 +1753,7 @@ class AttendanceController extends Controller
                                             'photo' => $input['file'],
                                             'batch_code' => $x['batch_code'],
                                             'update_attn_status' => 1,
-                                            'bulk_type' => 0,
+                                            'bulk_type' => 1,
                                             'approve_by' => $trainer_id,
                                             'approve_at' => now(),
                                         ]);
