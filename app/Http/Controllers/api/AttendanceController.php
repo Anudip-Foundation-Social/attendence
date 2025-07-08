@@ -1473,8 +1473,7 @@ class AttendanceController extends Controller
         $members= DB::connection('mysql_2')->table('enrollments as e')
                   ->leftJoin('members as m', 'e.member_id', '=', 'm.id')
                   ->whereIn('e.batch_id', $batch_ids)
-                  ->where('e.status', 'enrolled')
-                  ->get(['m.first_name as first_name','m.last_name as last_name','m.member_code as member_code','m.id as member_id','e.batch_id as batch_id']);
+                  ->get(['m.first_name as first_name','m.last_name as last_name','m.member_code as member_code','m.id as member_id','e.batch_id as batch_id','e.status as status']);
 
          return Response(['center_details' => $centers,'batches' => $batches,'members' => $members],200);
       // return Response(['center_details' => $details_from_cmis],200);            
