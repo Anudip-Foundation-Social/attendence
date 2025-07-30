@@ -1714,7 +1714,7 @@ class AttendanceController extends Controller
 
                                         $insertGetBatchId = DB::connection('mysql_2')->table('attendance_records')->insertGetId(
                                             array(
-                                                'source' => 'mobile_student',
+                                                'source' => 'mobile_trainer',
                                                 'mobile_app_id' => $mob_id,
                                                 'member_id'=>$member_id,
                                                 'member_type'=>'student',
@@ -1761,7 +1761,7 @@ class AttendanceController extends Controller
 
                                         $insertGetBatchId = DB::connection('mysql_2')->table('attendance_records')->insertGetId(
                                             array(
-                                                'source' => 'mobile_student',
+                                                'source' => 'mobile_trainer',
                                                 'mobile_app_id' => $mob_id,
                                                 'member_id'=>$member_id,
                                                 'member_type'=>'student',
