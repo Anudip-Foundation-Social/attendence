@@ -130,6 +130,18 @@ class AttendanceController extends Controller
         try { 
             date_default_timezone_set('Asia/Kolkata');
             $member_id=$request->member_id;
+            $batchdata = DB::table('enrollments as a')
+                        ->join('batches as b', 'a.batch_id', '=', 'b.id')
+                        ->where('a.member_id', $member_id)
+                        ->orderByDesc('a.id')
+                        ->get(['a.batch_id', 'b.center_id', 'b.batch_code']);
+            if(sizeof($batchdata)==0){
+              $center_id=$request->center_id;
+              $batch_code=$request->batch_code;
+            }else{
+              $center_id=$batchdata[0]->center_id;
+              $batch_code=$batchdata[0]->batch_code;
+            }            
                 if(str_starts_with($request->member_code, 'AF')){
                 $member_type='student';
                 }else{
@@ -240,10 +252,10 @@ class AttendanceController extends Controller
                     'atten_type' => $atten_type,
                     'member_type' => $member_type,
                     'reason' => $request->reason,
-                    'center_id' => $request->center_id,///
+                    'center_id' => $center_id,///
                     'punch_type' =>"I",
                     'photo' => $input['file'],
-                    'batch_code' => $request->batch_code,/////
+                    'batch_code' => $batch_code,/////
                     'update_attn_status' => 1,
                     'bulk_type' => 0,
                 ]);
@@ -373,11 +385,11 @@ class AttendanceController extends Controller
                                     'atten_type' => $atten_type,
                                     'member_type' => $member_type,
                                     'reason' => $request->reason,
-                                    'center_id' => $request->center_id,
+                                    'center_id' => $center_id,
                                     'punch_type' =>"O",
                                     'bulk_type' =>0,
                                     'photo' => $input['file'],
-                                    'batch_code' => $request->batch_code,
+                                    'batch_code' => $batch_code,
                                     'update_attn_status' => 1,
                                 ]);
 
@@ -591,6 +603,19 @@ class AttendanceController extends Controller
                     }
                     $member_id=$x['member_id'];
                     $attn_type=$x['attn_type'];
+
+                    $batchdata = DB::table('enrollments as a')
+                        ->join('batches as b', 'a.batch_id', '=', 'b.id')
+                        ->where('a.member_id', $member_id)
+                        ->orderByDesc('a.id')
+                        ->get(['a.batch_id', 'b.center_id', 'b.batch_code']);
+                    if(sizeof($batchdata)==0){
+                        $center_id=$x['center_id'];
+                        $batch_code=$x['batch_code'];
+                    }else{
+                        $center_id=$batchdata[0]->center_id;
+                        $batch_code=$batchdata[0]->batch_code;
+                    }  
                     
                     $details1 = Attendance::where('atten_date', $x['attend_date'])->where('user_id', $x['user_id'])->get();
                     
@@ -829,10 +854,10 @@ class AttendanceController extends Controller
                             'atten_type' => $atten_type,
                             'member_type' => $member_type,
                             'reason' => $x['reason'],
-                            'center_id' => $x['center_id'],///
+                            'center_id' => $center_id,///
                             'punch_type' =>"I",
                             'photo' => $input['file'],
-                            'batch_code' => $x['batch_code'],/////
+                            'batch_code' => $batch_code,/////
                             'update_attn_status' => 1,
                             'bulk_type' => 0,
                         ]);
@@ -953,10 +978,10 @@ class AttendanceController extends Controller
                                         'atten_type' => $atten_type,
                                         'member_type' => $member_type,
                                         'reason' => $x['reason'],
-                                        'center_id' => $x['center_id'],
+                                        'center_id' => $center_id,
                                         'punch_type' =>"O",
                                         'photo' => $input['file'],
-                                        'batch_code' => $x['batch_code'],
+                                        'batch_code' => $batch_code,
                                         'update_attn_status' => 1,
                                         'bulk_type'=>0
                                         
