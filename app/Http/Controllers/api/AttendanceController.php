@@ -604,7 +604,7 @@ class AttendanceController extends Controller
                     $member_id=$x['member_id'];
                     $attn_type=$x['attn_type'];
 
-                    $batchdata = DB::table('enrollments as a')
+                    $batchdata = DB::connection('mysql_2')->table('enrollments as a')
                         ->join('batches as b', 'a.batch_id', '=', 'b.id')
                         ->where('a.member_id', $member_id)
                         ->orderByDesc('a.id')
@@ -1596,6 +1596,19 @@ class AttendanceController extends Controller
                         //dd($student_list);
                         foreach($student_list as $member_id){
 
+                            $batchdata = DB::connection('mysql_2')->table('enrollments as a')
+                                ->join('batches as b', 'a.batch_id', '=', 'b.id')
+                                ->where('a.member_id', $member_id)
+                                ->orderByDesc('a.id')
+                                ->get(['a.batch_id', 'b.center_id', 'b.batch_code']);
+                            if(sizeof($batchdata)==0){
+                                $center_id=$x['center_id'];
+                                $batch_code=$x['batch_code'];
+                            }else{
+                                $center_id=$batchdata[0]->center_id;
+                                $batch_code=$batchdata[0]->batch_code;
+                            }  
+
                             $incount=Attendance::where('atten_date',$x['attend_date'])->where('member_id',$member_id)->count();
                            // dd($incount);
                             if($incount==0){
@@ -1671,10 +1684,10 @@ class AttendanceController extends Controller
                                     'atten_type' => $atten_type,
                                     'member_type' => $member_type,
                                     'reason' => $x['reason'],
-                                    'center_id' => $x['center_id'],
+                                    'center_id' => $center_id,
                                     'punch_type' =>"I",
                                     'photo' => $input['file'],
-                                    'batch_code' => $x['batch_code'],
+                                    'batch_code' => $batch_code,
                                     'update_attn_status' => 1,
                                     'bulk_type' => 1,
                                     'approve_by' => $trainer_id,
@@ -1772,10 +1785,10 @@ class AttendanceController extends Controller
                                             'atten_type' => $atten_type,
                                             'member_type' => $member_type,
                                             'reason' => $x['reason'],
-                                            'center_id' => $x['center_id'],
+                                            'center_id' => $center_id,
                                             'punch_type' =>"O",
                                             'photo' => $input['file'],
-                                            'batch_code' => $x['batch_code'],
+                                            'batch_code' => $batch_code,
                                             'update_attn_status' => 1,
                                             'bulk_type' => 1,
                                             'approve_by' => $trainer_id,
