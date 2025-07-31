@@ -130,7 +130,7 @@ class AttendanceController extends Controller
         try { 
             date_default_timezone_set('Asia/Kolkata');
             $member_id=$request->member_id;
-            $batchdata = DB::table('enrollments as a')
+            $batchdata = DB::connection('mysql_2')->table('enrollments as a')
                         ->join('batches as b', 'a.batch_id', '=', 'b.id')
                         ->where('a.member_id', $member_id)
                         ->orderByDesc('a.id')
