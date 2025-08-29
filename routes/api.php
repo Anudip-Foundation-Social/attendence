@@ -24,22 +24,23 @@ Route::get('/user', function (Request $request) {
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
+///////.............FROM 2025-08-29 STUDENT PART IS CLOSED ONLY TRAINER PART IS PRESENT IN THIS APP.....//////
 //Route::post('login',[UserController::class,'loginUser']);
 Route::post('login-trainer',[UserController::class,'loginUserForTrainer']);
-Route::post('insertIntoAttendanceFromCMIS',[AttendanceController::class,'insertIntoAttendanceFromCMIS']);
+//Route::post('insertIntoAttendanceFromCMIS',[AttendanceController::class,'insertIntoAttendanceFromCMIS']);
 Route::post('UpdateAttendance',[AttendanceController::class,'UpdateAttendance']);
-Route::post('insertIntoAttendanceFromCMISFromExcel',[AttendanceController::class,'insertIntoAttendanceFromCMISFromExcel']);
+//Route::post('insertIntoAttendanceFromCMISFromExcel',[AttendanceController::class,'insertIntoAttendanceFromCMISFromExcel']);
 
 Route::get('fetchDataForCheckingRedis',[AttendanceController::class,'fetchDataForCheckingRedis']);
 
 Route::group(['middleware' => 'auth:sanctum'],function(){
     Route::get('user',[UserController::class,'userDetails']);
     Route::get('logout',[UserController::class,'logout']);
-    Route::post('store-attendance-new',[AttendanceController::class,'storeAttendance']);
-    Route::post('offlineSync-new',[AttendanceController::class,'offlineSync']);
+    // Route::post('store-attendance-new',[AttendanceController::class,'storeAttendance']);
+    // Route::post('offlineSync-new',[AttendanceController::class,'offlineSync']);
     Route::post('offlineSyncBulkPunchInOutAttendance-new',[AttendanceController::class,'offlineSyncBulkPunchInOutAttendance']);
-    Route::get('fetch-attendance/{user_id}/{cur_month}/{cur_year}',[AttendanceController::class,'fetchAttendance']);
-    Route::get('fetch-attendance-based-on-currentdate/{user_id}/{cur_date?}',[AttendanceController::class,'fetchAttendanceBasedOnCurrentDate']);
+    //Route::get('fetch-attendance/{user_id}/{cur_month}/{cur_year}',[AttendanceController::class,'fetchAttendance']);
+    // Route::get('fetch-attendance-based-on-currentdate/{user_id}/{cur_date?}',[AttendanceController::class,'fetchAttendanceBasedOnCurrentDate']);
 
     Route::get('fetch-center-for-trainer/{trainer_id}',[TrainerController::class,'fetchCenterForTrainer']);
     Route::get('fetch-batch-by-center/{center_id}',[TrainerController::class,'fetchBatchByCenter']);
