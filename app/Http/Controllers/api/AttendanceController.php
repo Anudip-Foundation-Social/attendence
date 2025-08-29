@@ -1664,7 +1664,7 @@ class AttendanceController extends Controller
                                     'reason'          => $x['reason'],
                                     'bulk_type'       => 1,
                                     'created_by'      => $trainer_id,
-                                    'app_version'     => '1.0.1 (5)',
+                                    'app_version'     => '2.0.1',
                                     'created_at'      => now(),
                                     'updated_at'      => now(),
                                 ]);
