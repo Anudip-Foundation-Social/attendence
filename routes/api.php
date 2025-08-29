@@ -24,7 +24,8 @@ Route::get('/user', function (Request $request) {
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
-Route::post('login',[UserController::class,'loginUser']);
+//Route::post('login',[UserController::class,'loginUser']);
+Route::post('login-trainer',[UserController::class,'loginUserForTrainer']);
 Route::post('insertIntoAttendanceFromCMIS',[AttendanceController::class,'insertIntoAttendanceFromCMIS']);
 Route::post('UpdateAttendance',[AttendanceController::class,'UpdateAttendance']);
 Route::post('insertIntoAttendanceFromCMISFromExcel',[AttendanceController::class,'insertIntoAttendanceFromCMISFromExcel']);
