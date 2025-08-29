@@ -28,10 +28,10 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 //Route::post('login',[UserController::class,'loginUser']);
 Route::post('login',[UserController::class,'loginUserForTrainer']);
 //Route::post('insertIntoAttendanceFromCMIS',[AttendanceController::class,'insertIntoAttendanceFromCMIS']);
-Route::post('UpdateAttendance',[AttendanceController::class,'UpdateAttendance']);
+//Route::post('UpdateAttendance',[AttendanceController::class,'UpdateAttendance']);
 //Route::post('insertIntoAttendanceFromCMISFromExcel',[AttendanceController::class,'insertIntoAttendanceFromCMISFromExcel']);
 
-Route::get('fetchDataForCheckingRedis',[AttendanceController::class,'fetchDataForCheckingRedis']);
+// Route::get('fetchDataForCheckingRedis',[AttendanceController::class,'fetchDataForCheckingRedis']);
 
 Route::group(['middleware' => 'auth:sanctum'],function(){
     Route::get('user',[UserController::class,'userDetails']);
