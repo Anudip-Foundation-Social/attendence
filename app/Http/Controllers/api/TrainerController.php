@@ -60,7 +60,7 @@ class TrainerController extends Controller
 
         $batches = DB::connection('mysql_2')->table('batches')
             ->where('center_id', $center_id)
-            ->where('batch_type','=','Biometric Not Available')
+            //->where('batch_type','=','Biometric Not Available')
             ->where(function($query) use ($oneMonthAgo) {
                 $query->where('status', 'running')
                     ->orWhere(function($q) use ($oneMonthAgo) {
@@ -81,11 +81,26 @@ class TrainerController extends Controller
     {
        try{
 
-        $members= DB::connection('mysql_2')->table('enrollments as e')
-                  ->leftJoin('members as m', 'e.member_id', '=', 'm.id')
-                  ->where('e.batch_id', $batch_id)
-                  ->orderBy('m.first_name')
-                  ->get(['m.first_name as first_name','m.last_name as last_name','m.member_code as member_code','m.id as member_id','e.status as status']);
+        $batches = DB::connection('mysql_2')->table('batches')
+                   ->where('id', $batch_id)
+                   ->get(['batch_type']);
+        if($batches[0]->batch_type=='Biometric Not Available'){
+            $members= DB::connection('mysql_2')->table('enrollments as e')
+            ->leftJoin('members as m', 'e.member_id', '=', 'm.id')
+            ->where('e.batch_id', $batch_id)
+            ->orderBy('m.first_name')
+            ->get(['m.first_name as first_name','m.last_name as last_name','m.member_code as member_code','m.id as member_id','e.status as status']);
+        } else{
+            $members= DB::connection('mysql_2')->table('enrollments as e')
+            ->leftJoin('members as m', 'e.member_id', '=', 'm.id')
+            ->where('e.batch_id', $batch_id)
+            ->where('m.exception_attendance',1)
+            ->orderBy('m.first_name')
+            ->get(['m.first_name as first_name','m.last_name as last_name','m.member_code as member_code','m.id as member_id','e.status as status']);
+        }          
+
+        
+       
         foreach($members as $m){
             $x=Attendance::where('member_id',$m->member_id)->where('atten_date',date('Y-m-d'))->get(['punch_in','punch_out']);
             //dd($m->member_id,$x,date('Y-m-d'));
