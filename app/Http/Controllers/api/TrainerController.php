@@ -107,13 +107,16 @@ class TrainerController extends Controller
             if(sizeof($x)>0){
                 if($x[0]->punch_out!=null){
                     $m->type='complete';
+                    $m->punch_out_time=$x[0]->punch_out;
                 
                 }else{
                     $m->type='out';
+                    $m->punch_out_time=$x[0]->punch_out;
                 }
               
             }else{
                 $m->type='in';
+               
             }
         }          
          return Response(['members' => $members],200);            
