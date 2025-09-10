@@ -223,6 +223,30 @@ class TrainerController extends Controller
         }
     }
 
+    public function appVersionCheck(Request $request)
+    {
+       try{
+
+        $version_count = DB::connection('mysql_2')->table('anudip_app_version')
+                   ->where('app_name', trim($request->app_name))
+                   ->where('version', trim($request->version))
+                   ->where('status',1)
+                   ->count();
+        if($version_count==0){
+            return Response(['status' => 1,"msg"=>"require update"],200);    
+        }else{
+            return Response(['status' => 0,"msg"=>"not require"],200);    
+        }           
+        
+               
+
+       }catch(\Exception $e){
+        dd($e);
+        DB::rollback();
+        //return $this->sendError($e->getMessage());
+       }
+    }
+
     // public function storeAttendance(Request $request)
     // {
         
