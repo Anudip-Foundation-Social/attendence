@@ -1365,7 +1365,7 @@ class AttendanceController extends Controller
             foreach($request->all() as $r){
                 
                 
-                $student_id = DB::table('student_users')->updateOrInsert(
+                $student_id = User::updateOrInsert(
                     [
                         'username' =>$r['member_code'],
                     ],
