@@ -50,5 +50,6 @@ Route::group(['middleware' => 'auth:sanctum'],function(){
 
     Route::get('fetchAllDetailsForTrainer/{username}',[AttendanceController::class,'fetchAllDetailsForTrainer']);
 
-    Route::post('app-version-check',[TrainerController::class,'appVersionCheck']);
+    
 });
+Route::post('app-version-check',[TrainerController::class,'appVersionCheck']);
