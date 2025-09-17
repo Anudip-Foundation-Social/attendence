@@ -229,7 +229,7 @@ class TrainerController extends Controller
 
         $version_count = DB::connection('mysql_2')->table('anudip_app_version')
                    ->where('app_name', trim($request->app_name))
-                   ->where('version', trim($request->version))
+                   ->where('version', $request->version)
                    ->where('status',1)
                    ->count();
         if($version_count==0){
