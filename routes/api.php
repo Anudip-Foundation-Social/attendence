@@ -49,7 +49,7 @@ Route::group(['middleware' => 'auth:sanctum'],function(){
     Route::post('store-bulk-punchin-out-attendance-new',[TrainerController::class,'storeBulkPunchInOutAttendance']);
 
     Route::get('fetchAllDetailsForTrainer/{username}',[AttendanceController::class,'fetchAllDetailsForTrainer']);
-
+    Route::post('app-version-check',[TrainerController::class,'appVersionCheck']);
     
 });
-Route::post('app-version-check',[TrainerController::class,'appVersionCheck']);
+
