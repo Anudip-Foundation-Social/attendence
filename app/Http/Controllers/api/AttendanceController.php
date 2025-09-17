@@ -1689,7 +1689,7 @@ class AttendanceController extends Controller
                             'punch_in_place'  => '',
                             'reason'          => $x['reason'],
                             'bulk_type'       => 0,
-                            'app_version'     => '1.0.1 (5)',
+                            'app_version'     => '1.0.0',
                             'created_at'      => now(),
                             'updated_at'      => now(),
                         ]);
@@ -2261,7 +2261,7 @@ class AttendanceController extends Controller
                                     'reason'          => $x['reason'],
                                     'bulk_type'       => 1,
                                     'created_by'      => $trainer_id,
-                                    'app_version'     => '2.0.1',
+                                    'app_version'     => '1.0.0',
                                     'created_at'      => now(),
                                     'updated_at'      => now(),
                                 ]);
