@@ -166,7 +166,7 @@ class UserController extends Controller
                 ->where('m.deeptech_status', 1)
                 ->distinct('ur.role_id')
                 ->get(['m.first_name as first_name','m.last_name as last_name','u.user_id as user_id','u.email as email','u.password as password','r.id as role_id','r.name as role_name','m.mobile_no as mobile_no']);
-                //dd($details_from_cmis);
+                dd($details_from_cmis);
                 if(sizeof($details_from_cmis)>0){
                     DB::table('users')->insert([
                         'name' => $details_from_cmis[0]->first_name." ".$details_from_cmis[0]->last_name,
