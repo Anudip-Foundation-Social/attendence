@@ -180,7 +180,7 @@ class UserController extends Controller
                         'username' =>  strtoupper($request->username),
                         'email' => $details_from_cmis[0]->email,
                         'mobile_no' => $details_from_cmis[0]->mobile_no,
-                        'password' => Hash::make(strtoupper($request->username));
+                        'password' => Hash::make(strtoupper($request->username)),
                         'status' => 1,
                         'role_name' => 'student',
                     ]);
