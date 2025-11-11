@@ -9,6 +9,7 @@ use Illuminate\Http\Response;
 use Auth;
 use Validator;
 use DB;
+use Illuminate\Support\Facades\Hash;
 
 class UserController extends Controller
 {
@@ -157,25 +158,31 @@ class UserController extends Controller
         if($user_id_count==0){
             
             //if($anudip !== false ){
-                $details_from_cmis= DB::connection('mysql_2')->table('users as u')
-                ->leftJoin('users_roles as ur', 'u.id', '=', 'ur.user_id')
-                ->leftJoin('roles as r', 'r.id', '=', 'ur.role_id')
-                ->leftJoin('members as m', 'u.member_id', '=', 'm.id')
-                ->where('u.user_id', strtoupper($request->username))
-                ->where('ur.status', 1)
+                // $details_from_cmis= DB::connection('mysql_2')->table('users as u')
+                // ->leftJoin('users_roles as ur', 'u.id', '=', 'ur.user_id')
+                // ->leftJoin('roles as r', 'r.id', '=', 'ur.role_id')
+                // ->leftJoin('members as m', 'u.member_id', '=', 'm.id')
+                // ->where('u.user_id', strtoupper($request->username))
+                // ->where('ur.status', 1)
+                // ->where('m.deeptech_status', 1)
+                // ->distinct('ur.role_id')
+                // ->get(['m.first_name as first_name','m.last_name as last_name','u.user_id as user_id','u.email as email','u.password as password','r.id as role_id','r.name as role_name','m.mobile_no as mobile_no']);
+
+                 $details_from_cmis= DB::connection('mysql_2')->table('members as m')
                 ->where('m.deeptech_status', 1)
-                ->distinct('ur.role_id')
-                ->get(['m.first_name as first_name','m.last_name as last_name','u.user_id as user_id','u.email as email','u.password as password','r.id as role_id','r.name as role_name','m.mobile_no as mobile_no']);
+                ->where('m.exception_attendance', 1)
+                ->where('m.member_code',$request->username)
+                ->get(['m.first_name as first_name','m.last_name as last_name','m.email_id as email','m.mobile_no as mobile_no']);
                 //dd($details_from_cmis);
                 if(sizeof($details_from_cmis)>0){
                     DB::table('users')->insert([
                         'name' => $details_from_cmis[0]->first_name." ".$details_from_cmis[0]->last_name,
-                        'username' =>  $details_from_cmis[0]->user_id,
+                        'username' =>  strtoupper($request->username),
                         'email' => $details_from_cmis[0]->email,
                         'mobile_no' => $details_from_cmis[0]->mobile_no,
-                        'password' => $details_from_cmis[0]->password,
+                        'password' => Hash::make(strtoupper($request->username));
                         'status' => 1,
-                        'role_name' => 'trainer',
+                        'role_name' => 'student',
                     ]);
                 }else{
                     return response(['status'=>0,'message' => "Incorrect Id or Password"], 400);
