@@ -193,7 +193,7 @@ class UserController extends Controller
             
 
         }
-
+        dd($user_id_count);
         if(Auth::attempt($request->all())){
 
             $user = Auth::user(); 
