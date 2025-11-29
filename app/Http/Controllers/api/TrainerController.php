@@ -406,7 +406,7 @@ class TrainerController extends Controller
                         'username' => $members[0]->member_code,
                         'email' => $members[0]->email_id,
                         'mobile_no'=>$members[0]->mobile_no,
-                        'password'=>Hash::make('1234567'),
+                        'password'=>Hash::make($members[0]->member_code),
                         'member_id'=>$member_id,
                         'member_code'=>$members[0]->member_code,
                         'batch_id'=>$request->batch_id,
