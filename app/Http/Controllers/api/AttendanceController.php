@@ -1707,7 +1707,7 @@ class AttendanceController extends Controller
                             'member_code' => $x['member_code'],
                             'status' => 2,
                             'punch_place' => '',
-                            'atten_type' => $atten_type,
+                            'atten_type' => $attn_type,
                             'member_type' => $member_type,
                             'reason' => $x['reason'],
                             'center_id' => $center_id,///
@@ -1818,7 +1818,7 @@ class AttendanceController extends Controller
                                         'member_code' => $users[0]->member_code,
                                         'status' => 2,
                                         'punch_place' => '',
-                                        'atten_type' => $atten_type,
+                                        'atten_type' => $attn_type,
                                         'member_type' => $member_type,
                                         'reason' => $x['reason'],
                                         'center_id' => $center_id,
