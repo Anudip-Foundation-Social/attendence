@@ -1577,6 +1577,8 @@ class AttendanceController extends Controller
 
     public function offlineSync(Request $request)
     {
+       ini_set('max_execution_time', config('app.php_max_time'));
+	   ini_set('memory_limit', '4096M');
         
        DB::beginTransaction();
         try { 
