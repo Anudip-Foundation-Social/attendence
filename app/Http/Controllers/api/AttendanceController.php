@@ -2525,7 +2525,7 @@ class AttendanceController extends Controller
                         
             }
             DB::commit(); 
-            return Response(['message' => 'inserted successfully','status'=>1],200);
+            return Response(['message' => 'sync successfully','status'=>1],200);
             
 
         } catch (Exception $e) { 
