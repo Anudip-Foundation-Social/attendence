@@ -2557,7 +2557,7 @@ class AttendanceController extends Controller
                 $rows = [];
                 //dd($student_list);
                 foreach ($student_list as $member_id) {
-                      dd($member_id);
+                      //dd($member_id);
                     $s3_path = "attendance/" . trim($x['attend_date']) . "/";
                     $folderPath = "volume_blr1_01/" . trim($x['attend_date']) . "/";
 
@@ -2576,7 +2576,7 @@ class AttendanceController extends Controller
                     if ($image_base64 === false) {
                         continue; // invalid base64
                     }
-
+                    dd($image_base64);
                     // File name
                     $inputFileName = trim($x['batch_code']) . "_" . $x['attend_date'] . "_" . time() . ".jpg";
 
