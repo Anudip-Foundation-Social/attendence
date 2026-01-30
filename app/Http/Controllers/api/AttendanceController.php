@@ -2880,7 +2880,7 @@ class AttendanceController extends Controller
                             
                             
                         }  
-                        dd()
+                        
                         DB::table('offline_student_sync_logs')->where('id',$x['id'])
                         ->update([
                             'status' => 0,                        
