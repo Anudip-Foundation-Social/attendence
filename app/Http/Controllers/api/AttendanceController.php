@@ -2540,15 +2540,13 @@ class AttendanceController extends Controller
 
     public function offlineSyncBulkPunchInOutAttendance_test(Request $request)
     {
-        
-       DB::beginTransaction();
-       ini_set('max_execution_time', config('app.php_max_time'));
-	   ini_set('memory_limit', '4096M'); 
-       //dd('d');
-        try { 
-           //dd($request->all());
+        DB::beginTransaction();
+        ini_set('max_execution_time', config('app.php_max_time'));
+        ini_set('memory_limit', '4096M');
 
-           foreach ($request->all() as $x) {
+        try {
+
+            foreach ($request->all() as $x) {
 
                 $student_list = json_decode($x['studentList'] ?? '[]', true);
 
@@ -2560,73 +2558,70 @@ class AttendanceController extends Controller
 
                 foreach ($student_list as $member_id) {
 
-                            $s3_path="attendance/".trim($x['attend_date'])."/";
-                            $folderPath = "volume_blr1_01/".trim($x['attend_date'])."/";
-                            $base64Image = explode(";base64,", $x['image']);
-                            $explodeImage = explode("image/", $base64Image[0]);
-                            $imageType = $explodeImage[1];
-                            $image_base64 = base64_decode($base64Image[1]);
-                            $file = $folderPath . uniqid() . '.'.$imageType;
-                            if (!file_exists($folderPath)){
-                            mkdir($folderPath);
-                            }
-                            file_put_contents($file, $image_base64);
-                            //dd('end');
-                            $path = 'https://attendanceapi.anudip.org/'.$file;//need some changes
-                            $filename = basename($path);
-                            $input['file'] = trim($request->batch_code)."_".$x['attend_date']."_".time().'.jpg';
+                    $s3_path = "attendance/" . trim($x['attend_date']) . "/";
+                    $folderPath = "volume_blr1_01/" . trim($x['attend_date']) . "/";
 
-                            $imgFile = Image::make($path)->resize(200, 200, function ($constraint) {
-                                $constraint->aspectRatio();
-                            });
-                            
-                            // Save the resized image temporarily in a local folder (if needed)
-                            $tempPath = public_path($folderPath . $input['file']);
-                            $imgFile->save($tempPath);
-                            
-                            // Upload the resized image to S3
-                            Storage::disk('s3_1')->put($s3_path.$input['file'], file_get_contents($tempPath), [
-                                'ContentType' => mime_content_type($tempPath),
-                            ]);
+                    // Create folder if not exists (recursive)
+                    if (!file_exists(public_path($folderPath))) {
+                        mkdir(public_path($folderPath), 0777, true);
+                    }
+
+                    // Decode base64 image
+                    $base64Image = explode(";base64,", $x['image']);
+                    $explodeImage = explode("image/", $base64Image[0]);
+                    $imageType = $explodeImage[1] ?? 'jpg';
+
+                    $image_base64 = base64_decode($base64Image[1] ?? '', true);
+
+                    if ($image_base64 === false) {
+                        continue; // invalid base64
+                    }
+
+                    // File name
+                    $inputFileName = trim($x['batch_code']) . "_" . $x['attend_date'] . "_" . time() . ".jpg";
+
+                    // Save locally (optional)
+                    $localFilePath = public_path($folderPath . $inputFileName);
+                    file_put_contents($localFilePath, $image_base64);
+
+                    // Upload original image to S3
+                    Storage::disk('s3_1')->put($s3_path . $inputFileName, file_get_contents($localFilePath), [
+                        'ContentType' => mime_content_type($localFilePath),
+                    ]);
 
                     $rows[] = [
-                        // 🔹 full request data
-                        'attend_date'      => $x['attend_date'] ?? null,
-                        'trainer_user_id'  => $x['user_id'] ?? null,
-                        'batch_id'         => $x['  '] ?? null,
-                        'batch_code'       => $x['batch_code'] ?? null,
-                        'center_id'        => $x['center_id'] ?? null,
-                        'center_code'      => $x['center_code'] ?? null,
+                        'attend_date'     => $x['attend_date'] ?? null,
+                        'trainer_user_id' => $x['user_id'] ?? null,
+                        'batch_id'        => $x['batch_id'] ?? null,   // FIXED
+                        'batch_code'      => $x['batch_code'] ?? null,
+                        'center_id'       => $x['center_id'] ?? null,
+                        'center_code'     => $x['center_code'] ?? null,
 
-                        // 🔹 broken JSON
-                        'member_id'        => $member_id,
+                        'member_id'       => $member_id,
 
-                        // 🔹 remaining request fields
-                        'punch_time'       => $x['punch_time'] ?? null,
-                        'lat'              => $x['lat'] ?? null,
-                        'long'             => $x['long'] ?? null,
-                        'reason'           => $x['reason'] ?? null,
-                        'image_name'       => isset($input['file']) ? $input['file'] : null,
+                        'punch_time'      => $x['punch_time'] ?? null,
+                        'lat'             => $x['lat'] ?? null,
+                        'long'            => $x['long'] ?? null,
+                        'reason'          => $x['reason'] ?? null,
+                        'image_name'      => $inputFileName,
 
-                        'created_at'       => now(),
-                        'updated_at'       => now(),
+                        'created_at'      => now(),
+                        'updated_at'      => now(),
                     ];
                 }
 
-                // 🔒 avoid duplicates
                 DB::table('offline_student_sync_logs')->insertOrIgnore($rows);
-           }
+            }
 
-            
-            DB::commit(); 
-            return Response(['message' => 'sync successfully','status'=>1],200);
-            
+            DB::commit();
+            return response(['message' => 'sync successfully', 'status' => 1], 200);
 
-        } catch (Exception $e) { 
+        } catch (Exception $e) {
             DB::rollback();
             return $this->sendError($e->getMessage());
         }
     }
+
 
 
     public function offlineSyncBulkPunchInOutAttendance_cron(Request $request)
