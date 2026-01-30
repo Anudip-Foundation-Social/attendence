@@ -2638,13 +2638,12 @@ class AttendanceController extends Controller
        //dd('d');
         try { 
            //dd($request->all());
-           $mail_content=DB::table('offline_student_sync_logs')
-               ->where('status',0)
-               ->orderBy('id','asc')
-               ->limit(200)
-               ->get() 
-               >toArray();
-               dd($mail_content);
+           $mail_content = DB::table('offline_student_sync_logs')
+                            ->where('status', 0)
+                            ->orderBy('id', 'asc')
+                            ->limit(200)
+                            ->get();
+               dd($mail_content->toArray());
             if(sizeof($mail_content)){   
                
                 foreach($mail_content as $x){
