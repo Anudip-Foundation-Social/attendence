@@ -2647,7 +2647,8 @@ class AttendanceController extends Controller
             if(sizeof($mail_content)){   
                
                 foreach($mail_content as $x){
-                    dd((array)$x['image_name']);
+                    $x=(array)$x;
+                    dd($x['image_name']);
                     
                         //dd(json_decode($a['studentList'], true));
                         //$student_list=json_decode($x['studentList'], true);
