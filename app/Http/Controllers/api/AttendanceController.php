@@ -2647,10 +2647,10 @@ class AttendanceController extends Controller
             if(sizeof($mail_content)){   
                
                 foreach($mail_content as $x){
-                    //dd($x);
+                    dd($x['image_name']);
                     
                         //dd(json_decode($a['studentList'], true));
-                        $student_list=json_decode($x['studentList'], true);
+                        //$student_list=json_decode($x['studentList'], true);
                 
                         date_default_timezone_set('Asia/Kolkata');
                         $time=$x['punch_time'];
