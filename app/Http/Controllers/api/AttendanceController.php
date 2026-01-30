@@ -2549,7 +2549,7 @@ class AttendanceController extends Controller
             $x = $request->all();
 
             // Handle studentList coming as JSON string OR array
-            $student_list = json_decode($x['student_list'], true);
+            $student_list = json_decode($x['studentList'], true);
 
             $rows = [];
 
