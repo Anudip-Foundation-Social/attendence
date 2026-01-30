@@ -2772,7 +2772,7 @@ class AttendanceController extends Controller
                             
         
                         }else{
-                           dd('out');
+                           //dd('out');
                             $users=DB::table('users')->where('member_id', $member_id)->get(['id','member_code']);
                             $user_id= $users[0]->id;
         
