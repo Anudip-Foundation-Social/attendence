@@ -2671,7 +2671,7 @@ class AttendanceController extends Controller
                         // dd($incount);
                         $incount=Attendance::where('atten_date',$x['attend_date'])->where('member_id',$member_id)->count();
                         if($incount==0){
-                            //dd($member_id);
+                            dd($member_id);
                             $members=DB::connection('mysql_2')->table('members')->where('id',$member_id)->get(['member_code','first_name','last_name','email_id','mobile_no','gender']);
         
                             DB::table('users')->updateOrInsert([
@@ -2772,7 +2772,7 @@ class AttendanceController extends Controller
                             
         
                         }else{
-        
+                           dd('out');
                             $users=DB::table('users')->where('member_id', $member_id)->get(['id','member_code']);
                             $user_id= $users[0]->id;
         
@@ -2880,7 +2880,7 @@ class AttendanceController extends Controller
                             
                             
                         }  
-
+                        dd()
                         DB::table('offline_student_sync_logs')->where('id',$x['id'])
                         ->update([
                             'status' => 0,                        
