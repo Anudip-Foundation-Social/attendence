@@ -2547,6 +2547,7 @@ class AttendanceController extends Controller
         try {
 
             foreach ($request->all() as $x) {
+                dd($x);
 
                 $student_list = json_decode($x['studentList'] ?? '[]', true);
                 dd($student_list,$x['studentList']);
