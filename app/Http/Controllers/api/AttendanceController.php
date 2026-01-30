@@ -2593,7 +2593,7 @@ class AttendanceController extends Controller
                         // 🔹 full request data
                         'attend_date'      => $x['attend_date'] ?? null,
                         'trainer_user_id'  => $x['user_id'] ?? null,
-                        'batch_id'         => $x['batch_id'] ?? null,
+                        'batch_id'         => $x['  '] ?? null,
                         'batch_code'       => $x['batch_code'] ?? null,
                         'center_id'        => $x['center_id'] ?? null,
                         'center_code'      => $x['center_code'] ?? null,
