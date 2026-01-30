@@ -2557,7 +2557,7 @@ class AttendanceController extends Controller
                 $rows = [];
                 //dd($student_list);
                 foreach ($student_list as $member_id) {
-
+                      dd($member_id);
                     $s3_path = "attendance/" . trim($x['attend_date']) . "/";
                     $folderPath = "volume_blr1_01/" . trim($x['attend_date']) . "/";
 
