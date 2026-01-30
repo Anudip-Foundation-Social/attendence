@@ -2549,15 +2549,7 @@ class AttendanceController extends Controller
             $x = $request->all();
 
             // Handle studentList coming as JSON string OR array
-            $student_list = $x['studentList'] ?? [];
-
-            if (is_string($student_list)) {
-                $student_list = json_decode($student_list, true);
-            }
-
-            if (!is_array($student_list) || empty($student_list)) {
-                return response(['message' => 'studentList missing/invalid', 'status' => 0], 422);
-            }
+            $student_list = json_decode($student_list, true);
 
             $rows = [];
 
