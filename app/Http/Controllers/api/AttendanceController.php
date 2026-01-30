@@ -2643,10 +2643,11 @@ class AttendanceController extends Controller
                             ->orderBy('id', 'asc')
                             ->limit(200)
                             ->get();
-               dd($mail_content->toArray());
+               //dd($mail_content->toArray());
             if(sizeof($mail_content)){   
                
                 foreach($mail_content as $x){
+                    dd($x);
                     
                         //dd(json_decode($a['studentList'], true));
                         $student_list=json_decode($x['studentList'], true);
