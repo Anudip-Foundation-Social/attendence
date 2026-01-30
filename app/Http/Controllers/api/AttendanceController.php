@@ -2593,7 +2593,7 @@ class AttendanceController extends Controller
 
                     $rows[] = [
                         'attend_date'     => $x['attend_date'] ?? null,
-                        'trainer_user_id' => $x['user_id'] ?? null,
+                        'user_id' => $x['user_id'] ?? null,
                         'batch_id'        => $x['batch_id'] ?? null,   // FIXED
                         'batch_code'      => $x['batch_code'] ?? null,
                         'center_id'       => $x['center_id'] ?? null,
