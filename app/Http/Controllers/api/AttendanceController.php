@@ -2545,80 +2545,76 @@ class AttendanceController extends Controller
         ini_set('memory_limit', '4096M');
 
         try {
+           // dd($request->all());
+            $x=$request->all();
 
-            $x = $request->all();
+            //foreach ($request->all() as $x) {
+               // dd($x);
 
-            // Handle studentList coming as JSON string OR array
-            $student_list = json_decode($x['studentList'], true);
+                $student_list = json_decode($x['studentList'] ?? '[]', true);
+                //dd($student_list,$x['studentList']);
 
-            $rows = [];
-            //dd($student_list);
+                
 
-            foreach ($student_list as $member_id) {
+                $rows = [];
+                //dd($student_list);
+                foreach ($student_list as $member_id) {
+                      //dd($member_id);
+                    $s3_path = "attendance/" . trim($x['attend_date']) . "/";
+                    $folderPath = "volume_blr1_01/" . trim($x['attend_date']) . "/";
 
-                $s3_path = "attendance/" . trim($x['attend_date']) . "/";
-                $folderPath = "volume_blr1_01/" . trim($x['attend_date']) . "/";
+                    // Create folder if not exists (recursive)
+                    if (!file_exists(public_path($folderPath))) {
+                        mkdir(public_path($folderPath), 0777, true);
+                    }
 
-                // Create folder if not exists (recursive)
-                if (!file_exists(public_path($folderPath))) {
-                    mkdir(public_path($folderPath), 0777, true);
+                    // Decode base64 image
+                    $base64Image = explode(";base64,", $x['image']);
+                    $explodeImage = explode("image/", $base64Image[0]);
+                    $imageType = $explodeImage[1] ?? 'jpg';
+
+                    $image_base64 = base64_decode($base64Image[1] ?? '', true);
+
+                    if ($image_base64 === false) {
+                        continue; // invalid base64
+                    }
+                    //dd($image_base64);
+                    // File name
+                    $inputFileName = trim($x['batch_code']) . "_" . $x['attend_date'] . "_" . time() . ".jpg";
+
+                    // Save locally (optional)
+                    $localFilePath = public_path($folderPath . $inputFileName);
+                    file_put_contents($localFilePath, $image_base64);
+
+                    // Upload original image to S3
+                    Storage::disk('s3_1')->put($s3_path . $inputFileName, file_get_contents($localFilePath), [
+                        'ContentType' => mime_content_type($localFilePath),
+                    ]);
+
+                    $rows[] = [
+                        'attend_date'     => $x['attend_date'] ?? null,
+                        'trainer_user_id' => $x['user_id'] ?? null,
+                        'batch_id'        => $x['batch_id'] ?? null,   // FIXED
+                        'batch_code'      => $x['batch_code'] ?? null,
+                        'center_id'       => $x['center_id'] ?? null,
+                        'center_code'     => $x['center_code'] ?? null,
+
+                        'member_id'       => $member_id,
+
+                        'punch_time'      => $x['punch_time'] ?? null,
+                        'lat'             => $x['lat'] ?? null,
+                        'long'            => $x['long'] ?? null,
+                        'reason'          => $x['reason'] ?? null,
+                        'image_name'      => $inputFileName,
+
+                        'created_at'      => now(),
+                        'updated_at'      => now(),
+                    ];
                 }
+                //dd($rows);
 
-                // Validate image present
-                if (empty($x['image']) || !str_contains($x['image'], ';base64,')) {
-                    continue;
-                }
-
-                // Decode base64 image
-                $base64Image = explode(";base64,", $x['image']);
-                $explodeImage = explode("image/", $base64Image[0]);
-                $imageType = $explodeImage[1] ?? 'jpg';
-
-                $image_base64 = base64_decode($base64Image[1] ?? '', true);
-                if ($image_base64 === false) {
-                    continue;
-                }
-
-                // File name
-                $inputFileName = trim($x['batch_code']) . "_" . $x['attend_date'] . "_" . time() . ".jpg";
-
-                // Save original locally
-                $localFilePath = public_path($folderPath . $inputFileName);
-                file_put_contents($localFilePath, $image_base64);
-
-                // ✅ Resize & overwrite same file (or save to another file if you want)
-                Image::make($localFilePath)
-                    ->resize(200, 200, function ($constraint) {
-                        $constraint->aspectRatio();
-                        $constraint->upsize(); // prevents stretching small images
-                    })
-                    ->save($localFilePath);
-
-                // Upload resized image to S3
-                Storage::disk('s3_1')->put($s3_path . $inputFileName, file_get_contents($localFilePath), [
-                    'ContentType' => mime_content_type($localFilePath),
-                ]);
-
-                $rows[] = [
-                    'attend_date'  => $x['attend_date'] ?? null,
-                    'user_id'      => $x['user_id'] ?? null,
-                    'batch_id'     => $x['batch_id'] ?? null,
-                    'batch_code'   => $x['batch_code'] ?? null,
-                    'center_id'    => $x['center_id'] ?? null,
-                    'center_code'  => $x['center_code'] ?? null,
-                    'member_id'    => $member_id,
-                    'punch_time'   => $x['punch_time'] ?? null,
-                    'lat'          => $x['lat'] ?? null,
-                    'long'         => $x['long'] ?? null,
-                    'reason'       => $x['reason'] ?? null,
-                    'image_name'   => $inputFileName,
-                    'created_at'   => now(),
-                    'updated_at'   => now(),
-                ];
-            }
-            dd($rows);
-
-            DB::table('offline_student_sync_logs')->insertOrIgnore($rows);
+                DB::table('offline_student_sync_logs')->insertOrIgnore($rows);
+            //}
 
             DB::commit();
             return response(['message' => 'sync successfully', 'status' => 1], 200);
