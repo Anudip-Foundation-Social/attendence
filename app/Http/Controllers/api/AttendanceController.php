@@ -2549,6 +2549,7 @@ class AttendanceController extends Controller
             foreach ($request->all() as $x) {
 
                 $student_list = json_decode($x['studentList'] ?? '[]', true);
+                dd($student_list);
 
                 if (!is_array($student_list) || empty($student_list)) {
                     continue;
@@ -2576,7 +2577,7 @@ class AttendanceController extends Controller
                     if ($image_base64 === false) {
                         continue; // invalid base64
                     }
-                    dd($image_base64);
+                    //dd($image_base64);
                     // File name
                     $inputFileName = trim($x['batch_code']) . "_" . $x['attend_date'] . "_" . time() . ".jpg";
 
