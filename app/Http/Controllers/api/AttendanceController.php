@@ -2545,7 +2545,7 @@ class AttendanceController extends Controller
         ini_set('memory_limit', '4096M');
 
         try {
-            dd($request->all);
+            dd($request->all());
 
             foreach ($request->all() as $x) {
                 dd($x);
