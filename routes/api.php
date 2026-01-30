@@ -35,6 +35,7 @@ Route::post('UpdateAttendance',[AttendanceController::class,'UpdateAttendance'])
 // Route::get('fetchDataForCheckingRedis',[AttendanceController::class,'fetchDataForCheckingRedis']);
 
 Route::get('offlineSyncBulkPunchInOutAttendance_cron',[AttendanceController::class,'offlineSyncBulkPunchInOutAttendance_cron']);
+ Route::post('offlineSyncBulkPunchInOutAttendance-test',[AttendanceController::class,'offlineSyncBulkPunchInOutAttendance_test']);
 
 Route::group(['middleware' => 'auth:sanctum'],function(){
     Route::get('user',[UserController::class,'userDetails']);
