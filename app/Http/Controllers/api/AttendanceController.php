@@ -2545,17 +2545,16 @@ class AttendanceController extends Controller
         ini_set('memory_limit', '4096M');
 
         try {
-            dd($request->all());
+           // dd($request->all());
+            $x=$request->all();
 
-            foreach ($request->all() as $x) {
+            //foreach ($request->all() as $x) {
                 dd($x);
 
                 $student_list = json_decode($x['studentList'] ?? '[]', true);
                 dd($student_list,$x['studentList']);
 
-                if (!is_array($student_list) || empty($student_list)) {
-                    continue;
-                }
+                
 
                 $rows = [];
                 //dd($student_list);
@@ -2615,7 +2614,7 @@ class AttendanceController extends Controller
                 dd($rows);
 
                 DB::table('offline_student_sync_logs')->insertOrIgnore($rows);
-            }
+            //}
 
             DB::commit();
             return response(['message' => 'sync successfully', 'status' => 1], 200);
