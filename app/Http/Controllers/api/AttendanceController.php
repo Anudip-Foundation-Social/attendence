@@ -2552,6 +2552,7 @@ class AttendanceController extends Controller
             $student_list = json_decode($x['studentList'], true);
 
             $rows = [];
+            dd($student_list);
 
             foreach ($student_list as $member_id) {
 
