@@ -2560,6 +2560,35 @@ class AttendanceController extends Controller
 
                 foreach ($student_list as $member_id) {
 
+                            $s3_path="attendance/".trim($x['attend_date'])."/";
+                            $folderPath = "volume_blr1_01/".trim($x['attend_date'])."/";
+                            $base64Image = explode(";base64,", $x['image']);
+                            $explodeImage = explode("image/", $base64Image[0]);
+                            $imageType = $explodeImage[1];
+                            $image_base64 = base64_decode($base64Image[1]);
+                            $file = $folderPath . uniqid() . '.'.$imageType;
+                            if (!file_exists($folderPath)){
+                            mkdir($folderPath);
+                            }
+                            file_put_contents($file, $image_base64);
+                            //dd('end');
+                            $path = 'https://attendanceapi.anudip.org/'.$file;//need some changes
+                            $filename = basename($path);
+                            $input['file'] = trim($request->batch_code)."_".$x['attend_date']."_".time().'.jpg';
+
+                            $imgFile = Image::make($path)->resize(200, 200, function ($constraint) {
+                                $constraint->aspectRatio();
+                            });
+                            
+                            // Save the resized image temporarily in a local folder (if needed)
+                            $tempPath = public_path($folderPath . $input['file']);
+                            $imgFile->save($tempPath);
+                            
+                            // Upload the resized image to S3
+                            Storage::disk('s3_1')->put($s3_path.$input['file'], file_get_contents($tempPath), [
+                                'ContentType' => mime_content_type($tempPath),
+                            ]);
+
                     $rows[] = [
                         // 🔹 full request data
                         'attend_date'      => $x['attend_date'] ?? null,
