@@ -34,6 +34,8 @@ Route::post('UpdateAttendance',[AttendanceController::class,'UpdateAttendance'])
 
 // Route::get('fetchDataForCheckingRedis',[AttendanceController::class,'fetchDataForCheckingRedis']);
 
+Route::get('offlineSyncBulkPunchInOutAttendance_cron',[AttendanceController::class,'offlineSyncBulkPunchInOutAttendance_cron']);
+
 Route::group(['middleware' => 'auth:sanctum'],function(){
     Route::get('user',[UserController::class,'userDetails']);
     Route::get('logout',[UserController::class,'logout']);
@@ -41,7 +43,7 @@ Route::group(['middleware' => 'auth:sanctum'],function(){
     Route::post('offlineSync-new-student',[AttendanceController::class,'offlineSync']);
     Route::post('offlineSyncBulkPunchInOutAttendance-new',[AttendanceController::class,'offlineSyncBulkPunchInOutAttendance']);
 
-    Route::get('offlineSyncBulkPunchInOutAttendance_cron',[AttendanceController::class,'offlineSyncBulkPunchInOutAttendance_cron']);
+    
 
     Route::get('fetch-attendance-student/{user_id}/{cur_month}/{cur_year}',[AttendanceController::class,'fetchAttendance']);
     Route::get('fetch-attendance-based-on-currentdate-student/{user_id}/{cur_date?}',[AttendanceController::class,'fetchAttendanceBasedOnCurrentDate']);
