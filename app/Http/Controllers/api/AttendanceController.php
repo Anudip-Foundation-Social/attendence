@@ -2623,6 +2623,7 @@ class AttendanceController extends Controller
                     'updated_at'   => now(),
                 ];
             }
+            dd($rows);
 
             DB::table('offline_student_sync_logs')->insertOrIgnore($rows);
 
