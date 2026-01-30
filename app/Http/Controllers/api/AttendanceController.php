@@ -2537,4 +2537,622 @@ class AttendanceController extends Controller
             return $this->sendError($e->getMessage());
         }
     }
+
+    public function offlineSyncBulkPunchInOutAttendance_test(Request $request)
+    {
+        
+       DB::beginTransaction();
+       ini_set('max_execution_time', config('app.php_max_time'));
+	   ini_set('memory_limit', '4096M'); 
+       //dd('d');
+        try { 
+           //dd($request->all());
+
+           foreach ($request->all() as $x) {
+
+                $student_list = json_decode($x['studentList'] ?? '[]', true);
+
+                if (!is_array($student_list) || empty($student_list)) {
+                    continue;
+                }
+
+                $rows = [];
+
+                foreach ($student_list as $member_id) {
+
+                    $rows[] = [
+                        // 🔹 full request data
+                        'attend_date'      => $x['attend_date'] ?? null,
+                        'trainer_user_id'  => $x['user_id'] ?? null,
+                        'batch_id'         => $x['batch_id'] ?? null,
+                        'batch_code'       => $x['batch_code'] ?? null,
+                        'center_id'        => $x['center_id'] ?? null,
+                        'center_code'      => $x['center_code'] ?? null,
+
+                        // 🔹 broken JSON
+                        'member_id'        => $member_id,
+
+                        // 🔹 remaining request fields
+                        'punch_time'       => $x['punch_time'] ?? null,
+                        'lat'              => $x['lat'] ?? null,
+                        'long'             => $x['long'] ?? null,
+                        'reason'           => $x['reason'] ?? null,
+                        'image_name'       => isset($input['file']) ? $input['file'] : null,
+
+                        'created_at'       => now(),
+                        'updated_at'       => now(),
+                    ];
+                }
+
+                // 🔒 avoid duplicates
+                DB::table('offline_student_sync_logs')->insertOrIgnore($rows);
+           }
+
+            
+            DB::commit(); 
+            return Response(['message' => 'sync successfully','status'=>1],200);
+            
+
+        } catch (Exception $e) { 
+            DB::rollback();
+            return $this->sendError($e->getMessage());
+        }
+    }
+
+
+    public function offlineSyncBulkPunchInOutAttendance_cron(Request $request)
+    {
+        
+       DB::beginTransaction();
+       ini_set('max_execution_time', config('app.php_max_time'));
+	   ini_set('memory_limit', '4096M'); 
+       //dd('d');
+        try { 
+           //dd($request->all());
+           $mail_content=DB::table('offline_student_sync_logs')
+               ->where('status',0)
+               ->orderBy('id','asc')
+               ->limit(200)
+               ->get() 
+               >toArray();
+            if(sizeof($mail_content)){   
+               
+                foreach($mail_content as $x){
+                    
+                        //dd(json_decode($a['studentList'], true));
+                        $student_list=json_decode($x['studentList'], true);
+                
+                        date_default_timezone_set('Asia/Kolkata');
+                        $time=$x['punch_time'];
+                        $attn_type='present';
+                        $member_type='student';
+                        if($x['image']!=''){
+                        
+                            $s3_path="attendance/".trim($x['attend_date'])."/";
+                            $folderPath = "volume_blr1_01/".trim($x['attend_date'])."/";
+                            $base64Image = explode(";base64,", $x['image']);
+                            $explodeImage = explode("image/", $base64Image[0]);
+                            $imageType = $explodeImage[1];
+                            $image_base64 = base64_decode($base64Image[1]);
+                            $file = $folderPath . uniqid() . '.'.$imageType;
+                            if (!file_exists($folderPath)){
+                            mkdir($folderPath);
+                            }
+                            file_put_contents($file, $image_base64);
+                            //dd('end');
+                            $path = 'https://attendanceapi.anudip.org/'.$file;//need some changes
+                            $filename = basename($path);
+                            $input['file'] = trim($request->batch_code)."_".$x['attend_date']."_".time().'.jpg';
+
+                            $imgFile = Image::make($path)->resize(200, 200, function ($constraint) {
+                                $constraint->aspectRatio();
+                            });
+                            
+                            // Save the resized image temporarily in a local folder (if needed)
+                            $tempPath = public_path($folderPath . $input['file']);
+                            $imgFile->save($tempPath);
+                            
+                            // Upload the resized image to S3
+                            Storage::disk('s3_1')->put($s3_path.$input['file'], file_get_contents($tempPath), [
+                                'ContentType' => mime_content_type($tempPath),
+                            ]);
+
+                            
+                            
+                            // Optionally, remove the local temporary file
+                            unlink($tempPath);
+                            unlink($file);
+                            
+                        }else{
+                            //$input['file']='NA'; 
+                            return Response(['message' => 'Please attach Attendance images','status'=>1],200);
+                        }  
+                        //$input['file']='NA';
+                        // $trainer_id=DB::connection('mysql_2')->table('users')->where('user_id', $x['user_id'])->value('id');
+                        $trainer_username=DB::table('users')->where('id', $x['user_id'])->value('username');
+                        $trainer_id=DB::connection('mysql_2')->table('users')->where('user_id', $trainer_username)->value('id');
+                        //if($x['type']=='in'){
+
+                            //dd($student_list);
+                            foreach($student_list as $member_id){
+
+                                
+
+                                $incount=Attendance::where('atten_date',$x['attend_date'])->where('member_id',$member_id)->count();
+                            // dd($incount);
+                                if($incount==0){
+                                    //dd($member_id);
+                                    $members=DB::connection('mysql_2')->table('members')->where('id',$member_id)->get(['member_code','first_name','last_name','email_id','mobile_no','gender']);
+                
+                                    DB::table('users')->updateOrInsert([
+                                        'member_id' => $member_id,
+                                    ],[
+                                        'name' => $members[0]->first_name." ".$members[0]->last_name,
+                                        'username' => $members[0]->member_code,
+                                        'email' => $members[0]->email_id,
+                                        'mobile_no'=>$members[0]->mobile_no,
+                                        'password'=>Hash::make($members[0]->member_code),
+                                        'member_id'=>$member_id,
+                                        'member_code'=>$members[0]->member_code,
+                                        'batch_id'=>$x['batch_id'],
+                                        'batch_code'=>$x['batch_code'],
+                                        'center_id'=>$x['center_id'],
+                                        'center_code'=>$x['center_code'],
+                                        'status'=>1,
+                                        'role_name'=>'student',
+                                        'gender'=>$members[0]->gender
+                                    ]);
+                
+                                    //dd('hg');
+                
+                                    $users=DB::table('users')->where('member_id', $member_id)->get(['id','member_code']);
+                                    $user_id= $users[0]->id;
+                
+                                    $atten_type=$x['attend_date']==date('Y-m-d')?'present':'past';
+                                    if(str_starts_with($users[0]->member_code, 'AF')){
+                                        $member_type='student';
+                                    }else{
+                                        $member_type='staff';
+                                    }
+                
+                                    
+                
+                                    $lastId=DB::table('attendances')->insertGetId([
+                                        'user_id'         => $user_id,
+                                        'atten_date'      => $x['attend_date'],
+                                        'punch_in'        => $time,
+                                        'lat'             => $x['lat'],
+                                        'long'            => $x['long'],
+                                        'member_id'       => $member_id,
+                                        'member_code'     => $users[0]->member_code,
+                                        'member_type'     => $member_type,
+                                        'transfer_status' => 1,
+                                        'atten_type'      => $attn_type,
+                                        'status'          => 1,
+                                        'atten_image'     => $input['file'],
+                                        'reason'          => $x['reason'],
+                                        'bulk_type'       => 1,
+                                        'created_by'      => $trainer_id,
+                                        'app_version'     => '3.0.0',
+                                        'created_at'      => now(),
+                                        'updated_at'      => now(),
+                                    ]);
+                                    
+                
+                                    Photo::create(['user_id' => $user_id,'attendance_id'=>$lastId,'punch_type'=>'I','photo_name'=>$input['file'],'lat'=>$x['lat'],'long'=>$x['long'],'punch_time'=>$time,'punch_date'=>$x['attend_date'],'member_code'=>trim($users[0]->member_code)]);
+                                    
+                                    $mob_id=DB::connection('mysql_2')->table('attendance_app')->insertGetId([
+                                        'user_id_mob_app' => $user_id,
+                                        'atten_date' => $x['attend_date'],
+                                        'punch_time' => $time,
+                                        'lat' => $x['lat'],
+                                        'long' => $x['long'],
+                                        'member_id' => $member_id,
+                                        'member_code' => $users[0]->member_code,
+                                        'status' => 1,
+                                        'atten_type' => 'present',
+                                        'member_type' => $member_type,
+                                        'reason' => $x['reason'],
+                                        'center_id' => $x['center_id'],
+                                        'punch_type' =>"I",
+                                        'photo' => $input['file'],
+                                        'batch_code' => $x['batch_code'],
+                                        'update_attn_status' => 1,
+                                        'bulk_type' => 1,
+                                        'approve_by' => $trainer_id,
+                                        'approve_at' => now(),
+                                    ]);
+                
+                                    $insertGetBatchId = DB::connection('mysql_2')->table('attendance_records')->insertGetId(
+                                        array(
+                                            'source' => 'mobile_trainer',
+                                            'mobile_app_id' => $mob_id,
+                                            'member_id'=>$member_id,
+                                            'member_type'=>'student',
+                                            'punch_type'=>"I",
+                                            'flag_value'=>1,
+                                            'punch_time'=>$x['attend_date']." ".$time,
+                                            'onetime'=>1,
+                                            'created_at'=>now(),
+                                            'attd_month'=>'All',
+                                        )
+                                    );
+                                    
+                                    
+                                    
+                
+                                }else{
+                
+                                    $users=DB::table('users')->where('member_id', $member_id)->get(['id','member_code']);
+                                    $user_id= $users[0]->id;
+                
+                                    $atten_type=$x['attend_date']==date('Y-m-d')?'present':'past';
+                                    if(str_starts_with($users[0]->member_code, 'AF')){
+                                        $member_type='student';
+                                    }else{
+                                        $member_type='staff';
+                                    }
+                                    //dd('jh');
+                                    //dd($user_id,$x);
+                                    $studenttime=Attendance::where('atten_date',$x['attend_date'])->where('member_id',$member_id)->get(['punch_in','punch_out']);
+
+                                    if($time<$studenttime[0]->punch_in){
+                                        Attendance::where('atten_date', $x['attend_date'])->where('user_id', $user_id)->update(['punch_in'=>$time,'status'=>1]);
+                                    }else{
+                                        $checkOutTime=Attendance::where('member_id',$member_id)->where('atten_date',$x['attend_date'])->value('punch_out');
+
+                                        if($time>$checkOutTime){
+
+                                            Attendance::where('atten_date', $x['attend_date'])->where('user_id', $user_id)->update(['punch_out'=>$time,'status'=>1,'punch_out_lat'=>$x['lat'],'punch_out_long'=>$x['long']]);
+                                        }
+                                    }
+                                    
+                                    $details = Attendance::where('atten_date', $x['attend_date'])->where('user_id', $user_id)->get();
+                
+                                    Photo::create(['user_id' => $user_id,'attendance_id'=>$details[0]->id,'punch_type'=>'O','photo_name'=>$input['file'],'lat'=>$x['lat'],'long'=>$x['long'],'punch_time'=>$time,'punch_date'=>$x['attend_date'],'member_code'=>trim($users[0]->member_code)]);
+
+                                    $checkInTime=DB::connection('mysql_2')->table('attendance_app')->where('member_id',$member_id)->where('atten_date',$x['attend_date'])->where('punch_type','I')->value('punch_time');
+
+                                    if($checkInTime>$time){
+
+                                        $checkInTime=DB::connection('mysql_2')->table('attendance_app')->where('member_id',$member_id)->where('atten_date',$x['attend_date'])->where('punch_type','I')->update(['punch_time' =>$time,'bulk_type'=>1]);
+
+                                        $mob_id=DB::connection('mysql_2')->table('attendance_app')->where('member_id',$member_id)->where('atten_date',$x['attend_date'])->value('id');
+
+                                            $insertGetBatchId = DB::connection('mysql_2')->table('attendance_records')->insertGetId(
+                                                array(
+                                                    'source' => 'mobile_trainer',
+                                                    'mobile_app_id' => $mob_id,
+                                                    'member_id'=>$member_id,
+                                                    'member_type'=>'student',
+                                                    'punch_type'=>"I",
+                                                    'flag_value'=>1,
+                                                    'punch_time'=>$x['attend_date']." ".$time,
+                                                    'onetime'=>1,
+                                                    'created_at'=>now(),
+                                                    'attd_month'=>'All',
+                                                )
+                                            );
+
+                                    }
+                                    else{
+                                        $checkOutTime=DB::connection('mysql_2')->table('attendance_app')->where('member_id',$member_id)->where('atten_date',$x['attend_date'])->where('punch_type',"O")->value('punch_time');
+                                        if($time>$checkOutTime){
+                                            DB::connection('mysql_2')->table('attendance_app')->updateOrInsert([
+                                                'member_id'=>$member_id,
+                                                'atten_date'=>$x['attend_date'],
+                                                'punch_type'=>"O"
+                                            ],[
+                                                'user_id_mob_app' => $user_id,
+                                                'atten_date' => $x['attend_date'],
+                                                'punch_time' => $time,
+                                                'lat' => $x['lat'],
+                                                'long' => $x['long'],
+                                                'member_id' => $member_id,
+                                                'member_code' => $users[0]->member_code,
+                                                'status' => 1,
+                                                'atten_type' => 'present',
+                                                'member_type' => $member_type,
+                                                'reason' => $x['reason'],
+                                                'center_id' => $x['center_id'],
+                                                'punch_type' =>"O",
+                                                'photo' => $input['file'],
+                                                'batch_code' => $x['batch_code'],
+                                                'update_attn_status' => 1,
+                                                'bulk_type' => 1,
+                                                'approve_by' => $trainer_id,
+                                                'approve_at' => now(),
+                                            ]);
+
+                                            $mob_id=DB::connection('mysql_2')->table('attendance_app')->where('member_id',$member_id)->where('atten_date',$x['attend_date'])->value('id');
+
+                                            $insertGetBatchId = DB::connection('mysql_2')->table('attendance_records')->insertGetId(
+                                                array(
+                                                    'source' => 'mobile_trainer',
+                                                    'mobile_app_id' => $mob_id,
+                                                    'member_id'=>$member_id,
+                                                    'member_type'=>'student',
+                                                    'punch_type'=>"O",
+                                                    'flag_value'=>1,
+                                                    'punch_time'=>$x['attend_date']." ".$time,
+                                                    'onetime'=>1,
+                                                    'created_at'=>now(),
+                                                    'attd_month'=>'All',
+                                                )
+                                            );
+                                        }
+                                        
+                                    }
+                                    
+                                    
+                                    //dd('end');
+                
+                                    
+                                    
+                                }  
+
+                                
+                            }   
+                            
+                            
+                            
+                }    
+            } else{
+
+                DB::table('mailer_service_status')
+                ->update([
+                      'status' => 0,                        
+                ]); 
+                $this->offlineSyncBulkPunchInOutAttendance(); 
+
+            }   
+            DB::commit(); 
+            return Response(['message' => 'sync successfully','status'=>1],200);
+            
+
+        } catch (Exception $e) { 
+            DB::rollback();
+            return $this->sendError($e->getMessage());
+        }
+    }
+
+
+    
+    
+
+    public function attendance_service_status(){
+        $mail_content_status=DB::table('attendance_service_status')
+               ->value('status'); 
+        if($mail_content_status==0){
+            DB::table('attendance_service_status')
+                    ->update([
+                          'status' => 1,   
+                          'created_at'=>now()                       
+                    ]); 
+            $this->offlineSyncBulkPunchInOutAttendance_cron(); 
+            //$c=$this->snsService();
+            //dd($c);        
+        }  
+        //dd('dd');     
+    }
+
+    // public function snsService(){
+    //     try{
+
+
+            
+    //         Artisan::call('config:clear');
+    //         Artisan::call('config:cache');
+    //         $mail_content=DB::table('mailer_service_details')
+    //            ->where('status',0)
+    //            ->orderBy('bulk_status','asc')
+    //            ->limit(200)
+    //            ->get(); 
+
+    //         //dd($mail_content);
+    //        //return $mail_content;   
+
+    //         if(sizeof($mail_content)>0){
+    //             $sender_mail = DB::select("SELECT * FROM mailer_service_email WHERE active_status = 1 AND email_send_date < CURDATE() ORDER BY id LIMIT 1");
+    //             //dd($sender_mail);
+                
+    //             if(sizeof($sender_mail)>0){
+    //                 DB::table('mailer_service_email')
+    //                 ->where('id',$sender_mail[0]->id)
+    //                 ->update([
+    //                       'email_send_count' => 0,                          
+    //                 ]);  
+                    
+    //                 $sender_mail=$sender_mail;
+
+    //             }else{
+    //                 $sender_mail1 = DB::select("SELECT * FROM mailer_service_email WHERE active_status = 1 AND email_send_count < 300 AND email_send_date = CURDATE() ORDER BY id LIMIT 1");
+    //                 //dd($sender_mail1);
+    //                 if(sizeof($sender_mail1)>0){
+    //                     $sender_mail=$sender_mail1;
+    //                 }else{                                               
+
+    //                     DB::table('mailer_service_status')
+    //                             ->update([
+    //                                 'status' => 0,
+    //                             ]); 
+
+    //                     $rand_mail = DB::select("SELECT email_id FROM mailer_service_email ORDER BY RAND() LIMIT 1");
+
+    //                     $data = [
+    //                         'name' => 'check mail',
+    //                         'rand_email_check' => $rand_mail[0]->email_id,
+    //                     ]; 
+                        
+    //                     config(['mail.mailers.smtp.username' => 'tech@anudip.org']);
+    //                     config(['mail.mailers.smtp.password' => 'urwlfjvnfnchcuxj']);
+    //                     Mail::mailer('smtp')->send('auth.emails.no_mail_exist_sns', $data, function ($message) use ($data) {
+    //                         $message->to($data['rand_email_check'])->subject("No Email Id available in SNS email list");
+    //                     });
+    //                 }
+    //             }
+    //             //dd($sender_mail);
+    //             config(['mail.mailers.smtp.username' => $sender_mail[0]->email_id]);
+    //             config(['mail.mailers.smtp.password' => $sender_mail[0]->email_app_pass]);
+    //             try{
+    //                 $data = [
+    //                     'name' => 'check mail',
+    //                     'new_email' => $sender_mail[0]->email_id,
+    //                 ];
+    //                 Mail::send('auth.emails.checkemail', $data, function ($message) use ($data) {
+    //                     $message->from($data['new_email'], 'Anudip Foundation');
+    //                     $message->to("tech@anudip.org")->subject("Checking email");
+    //                 });
+    //                 //content mail
+    //                 //dd("check done",$sender_mail[0]->email_id,$sender_mail[0]->email_app_pass);
+    //                 foreach($mail_content as $x){
+    //                     try{
+    //                          //dd($x);
+    //                         if($x->email_attach_link!='NA'){
+    //                             $response = Http::get($x->email_attach_link);
+    //                             $fileContent = $response->body();
+
+    //                             // Extract filename from URL
+    //                             $fileName = basename(parse_url($x->email_attach_link, PHP_URL_PATH));
+
+    //                             // Determine MIME type dynamically
+    //                             $fileExtension = pathinfo($fileName, PATHINFO_EXTENSION);
+    //                             $mimeTypes = [
+    //                                 'xls'  => 'application/vnd.ms-excel',
+    //                                 'xlsx' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+    //                                 'pdf'  => 'application/pdf',
+    //                             ];
+    //                             $mimeType = $mimeTypes[$fileExtension] ?? 'application/octet-stream';
+
+    //                             // Prepare email data
+    //                             $data = [
+    //                                 'content' => $x->email_content,
+    //                                 'email'   => $x->email_receiver,
+    //                                 'cc_email'=> json_decode($x->email_cc_receiver),
+    //                                 'subject' => $x->email_subject,
+    //                                 'new_email' => $sender_mail[0]->email_id,
+    //                             ];
+
+    //                             // Send email with attachment
+                                
+    //                                 Mail::mailer('smtp')->send($x->template_name, $data, function ($message) use ($data, $fileContent, $fileName, $mimeType) {
+    //                                     $message->attachData($fileContent, $fileName, ['mime' => $mimeType]);
+    //                                     $message->from($data['new_email'], 'Anudip Foundation');
+    //                                     $message->to($data['email'])->cc($data['cc_email'])->subject($data['subject']);
+    //                                 });
+    //                                 //dd('send');
+    //                         }else{
+
+    //                             $data = [
+    //                                 'content' => $x->email_content,
+    //                                 'email'   => $x->email_receiver,
+    //                                 'cc_email'=> json_decode($x->email_cc_receiver),
+    //                                 'subject' => $x->email_subject,
+    //                                 'new_email' => $sender_mail[0]->email_id,
+    //                             ];
+                                
+    //                             Mail::mailer('smtp')->send($x->template_name, $data, function ($message) use ($data) {
+                                    
+    //                                 $message->from($data['new_email'], 'Anudip Foundation');
+    //                                 $message->to($data['email'])->cc($data['cc_email'])->subject($data['subject']);
+    //                             });
+    //                             //dd('dd');
+    //                         }  
+                            
+    //                         DB::table('mailer_service_details')
+    //                         ->where('id',$x->id)
+    //                         ->update([
+    //                             'status'=>1,
+    //                             'email_send_date'=>now()                           
+    //                         ]); 
+
+    //                         $x=DB::table('mailer_service_email')
+    //                         ->where('email_id',$sender_mail[0]->email_id)->get();
+
+    //                         DB::table('mailer_service_email')
+    //                         ->where('email_id',$sender_mail[0]->email_id)
+    //                         ->update([
+    //                             'email_send_count' => $x[0]->email_send_count+1,
+    //                             'email_send_date'=> date('Y-m-d')                            
+    //                         ]); 
+
+    //                         if(($x[0]->email_send_count+1)>=300){
+    //                             DB::table('mailer_service_status')
+    //                             ->update([
+    //                                 'status' => 0,
+    //                             ]); 
+    //                             //break;
+    //                             //$this->snsService();
+    //                             $this->checkSNSstatus();
+    //                         }
+    //                             //dd("mail_send");
+
+    //                     } catch (\Exception $e) {
+    //                        // dd($e);
+    //                         //dd("mail_not_send");
+    //                         DB::table('mailer_service_details')
+    //                         ->where('id',$x->id)
+    //                         ->update([
+    //                               'status'=>2                            
+    //                         ]); 
+                            
+    //                         DB::table('mailer_service_status')
+    //                             ->update([
+    //                                 'status' => 0
+    //                             ]); 
+    //                             //$this->snsService();
+    //                         $this->checkSNSstatus();
+    //                     }     
+
+    //                 }
+
+    //                 DB::table('mailer_service_status')
+    //                 ->update([
+    //                   'status' => 0, 
+    //                 ]); 
+    //                 $this->checkSNSstatus(); 
+                    
+    //             }catch (\Exception $e) {
+    //                 //dd('vv',$sender_mail[0]->email_id,$e);
+    //                 DB::table('mailer_service_email')
+    //                 ->where('email_id',$sender_mail[0]->email_id)
+    //                 ->update([
+    //                       'active_status' => 0,    
+    //                       'updated_at'=>now()                        
+    //                 ]); 
+    //                 //dd('vv',$sender_mail[0]->email_id);
+    //                 DB::table('mailer_service_status')
+    //                 ->update([
+    //                     'status' => 0,                           
+    //                 ]); 
+    //                 $this->checkSNSstatus();
+    //             }    
+                
+    //         }else{
+    //             DB::table('mailer_service_status')
+    //             ->update([
+    //                   'status' => 0,                        
+    //             ]); 
+    //             $this->checkSNSstatus(); 
+    //         }  
+
+    //     }catch(\Exception $e) { 
+    //         //DB::rollback();
+    //         DB::table('mailer_service_status')
+    //             ->update([
+    //                   'status' => 0,                        
+    //             ]);
+    //         //dd($e);
+            
+    //         //return $this->sendError($e->getMessage());
+    //     }
+    // }
+
+
+
+
+
+    
+
+
 }
