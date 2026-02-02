@@ -2659,7 +2659,7 @@ class AttendanceController extends Controller
 
 
 
-    public function offlineSyncBulkPunchInOutAttendance_cron(Request $request)
+    public function offlineSyncBulkPunchInOutAttendance_cron()
     {
         
       // DB::beginTransaction();
