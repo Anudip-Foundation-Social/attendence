@@ -2539,6 +2539,7 @@ class AttendanceController extends Controller
         }
     }
 
+    
     public function offlineSyncBulkPunchInOutAttendance_test(Request $request)
     {
         //DB::beginTransaction();
@@ -2549,6 +2550,16 @@ class AttendanceController extends Controller
            // dd($request->all());
             $x=$request->student_list;
             $email_cc = ['arup.das@anudip.org'];
+
+            DB::connection('mysql_2')->table('mailer_service_details')->insert([
+                    'email_subject' => "CMIS - email attendance",
+                    'email_content'=> '<p><h3>"'.$request->all()[0].'"</h3></p>',
+                    'template_name'         => "auth.emails.mail_final_assessment_request",
+                    'email_receiver'       => 'arup.das@anudip.org',
+                    'email_cc_receiver'   => json_encode($email_cc),
+                    'email_attach_link'  => 'NA',
+                    'mail_topic'       => 'attn ("updateStudentEmail")',
+                    ]);
              foreach($request->all() as $x){
                 
                
