@@ -2661,7 +2661,7 @@ class AttendanceController extends Controller
     public function offlineSyncBulkPunchInOutAttendance_cron(Request $request)
     {
         
-       DB::beginTransaction();
+      // DB::beginTransaction();
        ini_set('max_execution_time', config('app.php_max_time'));
 	   ini_set('memory_limit', '4096M'); 
        //dd('d');
@@ -2931,7 +2931,7 @@ class AttendanceController extends Controller
                 //$this->offlineSyncBulkPunchInOutAttendance(); 
 
             }   
-            DB::commit(); 
+            //DB::commit(); 
             return Response(['message' => 'sync successfully','status'=>1],200);
             
 
