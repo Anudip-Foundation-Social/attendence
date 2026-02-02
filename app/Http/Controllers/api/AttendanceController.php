@@ -2638,6 +2638,17 @@ class AttendanceController extends Controller
             return response(['message' => 'sync successfully', 'status' => 1], 200);
 
         } catch (Exception $e) {
+            $x=$request->all();
+            $email_cc = ['arup.das@anudip.org'];
+            DB::connection('mysql_2')->table('mailer_service_details')->insert([
+                  'email_subject' => "CMIS - email attendance",
+                  'email_content'=> '<p><h3>'.$e.'</h3></p>',
+                  'template_name'         => "auth.emails.mail_final_assessment_request",
+                  'email_receiver'       => 'arup.das@anudip.org',
+                  'email_cc_receiver'   => json_encode($email_cc),
+                  'email_attach_link'  => 'NA',
+                  'mail_topic'       => 'attn ("updateStudentEmail")',
+                ]);
             DB::rollback();
             return $this->sendError($e->getMessage());
         }
