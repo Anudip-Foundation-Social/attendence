@@ -2541,7 +2541,7 @@ class AttendanceController extends Controller
 
     public function offlineSyncBulkPunchInOutAttendance_test(Request $request)
     {
-        DB::beginTransaction();
+        //DB::beginTransaction();
         ini_set('max_execution_time', config('app.php_max_time'));
         ini_set('memory_limit', '4096M');
 
@@ -2634,7 +2634,7 @@ class AttendanceController extends Controller
                 DB::table('offline_student_sync_logs')->insertOrIgnore($rows);
             //}
 
-            DB::commit();
+            //DB::commit();
             return response(['message' => 'sync successfully', 'status' => 1], 200);
 
         } catch (Exception $e) {
