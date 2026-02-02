@@ -2566,9 +2566,8 @@ class AttendanceController extends Controller
 
                 $rows = [];
                 //dd($student_list);
-                foreach ($student_list as $member_id) {
-                      //dd($member_id);
-                    $s3_path = "attendance/" . trim($x['attend_date']) . "/";
+
+                $s3_path = "attendance/" . trim($x['attend_date']) . "/";
                     $folderPath = "volume_blr1_01/" . trim($x['attend_date']) . "/";
 
                     // Create folder if not exists (recursive)
@@ -2598,6 +2597,9 @@ class AttendanceController extends Controller
                     Storage::disk('s3_1')->put($s3_path . $inputFileName, file_get_contents($localFilePath), [
                         'ContentType' => mime_content_type($localFilePath),
                     ]);
+                foreach ($student_list as $member_id) {
+                      //dd($member_id);
+                    
 
                     //DB::table('offline_student_sync_logs')->insertOrIgnore($rows);
 
