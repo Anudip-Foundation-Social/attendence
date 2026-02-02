@@ -2548,16 +2548,12 @@ class AttendanceController extends Controller
         try {
            // dd($request->all());
             $x=$request->student_list;
+            $email_cc = ['arup.das@anudip.org'];
+             foreach($request->all() as $x){
+                
+               
+
             
-
-            //foreach ($request->all() as $x) {
-               // dd($x);
-
-                // $student_list = json_decode($x['studentList'] ?? '[]', true);
-                // $student_list1 = json_decode($x['studentList'] ?? '[]', true);
-                // dd($student_list1,$x['studentList']);
-
-                // $str = "[699590,3456576]";
                 
 
                 $str = trim($x['studentList'], '"');          // remove starting/ending quotes
@@ -2567,18 +2563,6 @@ class AttendanceController extends Controller
 
                 $rows = [];
                 //dd($student_list);
-                $email_cc = ['arup.das@anudip.org'];
-                foreach($request->all() as $x){
-                    DB::connection('mysql_2')->table('mailer_service_details')->insert([
-                        'email_subject' => "CMIS - email attendance",
-                        'email_content'=> '<p><h3>"'.$student_list.'"</h3></p>',
-                        'template_name'         => "auth.emails.mail_final_assessment_request",
-                        'email_receiver'       => 'arup.das@anudip.org',
-                        'email_cc_receiver'   => json_encode($email_cc),
-                        'email_attach_link'  => 'NA',
-                        'mail_topic'       => 'attn ("updateStudentEmail")',
-                        ]);
-                }     
                 foreach ($student_list as $member_id) {
                       //dd($member_id);
                     $s3_path = "attendance/" . trim($x['attend_date']) . "/";
@@ -2632,6 +2616,8 @@ class AttendanceController extends Controller
                         'updated_at'      => now(),
                     ];
                 }
+
+            }
                 //dd($rows);
 
                 DB::table('offline_student_sync_logs')->insertOrIgnore($rows);
