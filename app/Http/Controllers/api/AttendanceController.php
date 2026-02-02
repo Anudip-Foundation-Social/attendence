@@ -2916,7 +2916,7 @@ class AttendanceController extends Controller
                             'status' => 1,                        
                         ]); 
 
-                        dd($incount,$x['id']);     
+                        //dd($incount,$x['id']);     
                             //}   
                             
                             
@@ -2924,7 +2924,7 @@ class AttendanceController extends Controller
                 }    
             } else{
 
-                DB::table('mailer_service_status')
+                DB::table('attendance_service_status')
                 ->update([
                       'status' => 0,                        
                 ]); 
