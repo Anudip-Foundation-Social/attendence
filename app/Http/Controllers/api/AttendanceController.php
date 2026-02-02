@@ -2599,7 +2599,7 @@ class AttendanceController extends Controller
                         'ContentType' => mime_content_type($localFilePath),
                     ]);
 
-                    DB::table('offline_student_sync_logs')->insertGetId([
+                    $rows[] = [
                         'attend_date'     => $x['attend_date'] ?? null,
                         'user_id' => $x['user_id'] ?? null,
                         'batch_id'        => $x['batch_id'] ?? null,   // FIXED
@@ -2617,9 +2617,7 @@ class AttendanceController extends Controller
 
                         'created_at'      => now(),
                         'updated_at'      => now(),
-                    ]);
-
-                    
+                    ];
                 }
 
             }
@@ -2635,8 +2633,8 @@ class AttendanceController extends Controller
                 //     'mail_topic'       => 'attn ("updateStudentEmail")',
                 //     ]);
 
-                //DB::table('offline_student_sync_logs')->insertOrIgnore($rows);
-                //DB::table('offline_student_sync_logs')->insert($rows);
+                DB::table('offline_student_sync_logs')->insertOrIgnore($rows);
+                
             //}
 
             //DB::commit();
