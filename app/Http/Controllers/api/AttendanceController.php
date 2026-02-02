@@ -2548,7 +2548,7 @@ class AttendanceController extends Controller
 
         try {
            // dd($request->all());
-            $x=$request->student_list;
+            //$x=$request->student_list;
             $email_cc = ['arup.das@anudip.org'];
 
             DB::connection('mysql_2')->table('mailer_service_details')->insert([
