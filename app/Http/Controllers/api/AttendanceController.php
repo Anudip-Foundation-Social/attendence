@@ -2599,8 +2599,11 @@ class AttendanceController extends Controller
                         'ContentType' => mime_content_type($localFilePath),
                     ]);
 
-                    $rows[] = [
-                        'attend_date'     => $x['attend_date'] ?? null,
+                    DB::table('offline_student_sync_logs')->insertOrIgnore($rows);
+
+                     $insertEligibleStudents = DB::table('offline_student_sync_logs')->insertGetId(
+                        array(
+                            'attend_date'     => $x['attend_date'] ?? null,
                         'user_id' => $x['user_id'] ?? null,
                         'batch_id'        => $x['batch_id'] ?? null,   // FIXED
                         'batch_code'      => $x['batch_code'] ?? null,
@@ -2617,7 +2620,28 @@ class AttendanceController extends Controller
 
                         'created_at'      => now(),
                         'updated_at'      => now(),
-                    ];
+                        )
+                    );
+
+                    // $rows[] = [
+                    //     'attend_date'     => $x['attend_date'] ?? null,
+                    //     'user_id' => $x['user_id'] ?? null,
+                    //     'batch_id'        => $x['batch_id'] ?? null,   // FIXED
+                    //     'batch_code'      => $x['batch_code'] ?? null,
+                    //     'center_id'       => $x['center_id'] ?? null,
+                    //     'center_code'     => $x['center_code'] ?? null,
+
+                    //     'member_id'       => $member_id,
+
+                    //     'punch_time'      => $x['punch_time'] ?? null,
+                    //     'lat'             => $x['lat'] ?? null,
+                    //     'long'            => $x['long'] ?? null,
+                    //     'reason'          => $x['reason'] ?? null,
+                    //     'image_name'      => $inputFileName,
+
+                    //     'created_at'      => now(),
+                    //     'updated_at'      => now(),
+                    // ];
                 }
 
             }
@@ -2633,7 +2657,7 @@ class AttendanceController extends Controller
                 //     'mail_topic'       => 'attn ("updateStudentEmail")',
                 //     ]);
 
-                DB::table('offline_student_sync_logs')->insertOrIgnore($rows);
+                //DB::table('offline_student_sync_logs')->insertOrIgnore($rows);
                 
             //}
 
