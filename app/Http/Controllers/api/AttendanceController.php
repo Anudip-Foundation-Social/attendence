@@ -2552,7 +2552,7 @@ class AttendanceController extends Controller
                // dd($x);
 
                 $student_list = json_decode($x['studentList'] ?? '[]', true);
-                //dd($student_list,$x['studentList']);
+                dd($student_list,$x['studentList']);
 
                 
 
