@@ -2560,7 +2560,7 @@ class AttendanceController extends Controller
 
                 $str = trim($x['studentList'], '"');          // remove starting/ending quotes
                 $student_list = json_decode($str, true);
-                dd($student_list);
+                //dd($student_list);
                 
 
                 $rows = [];
