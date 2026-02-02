@@ -2558,7 +2558,7 @@ class AttendanceController extends Controller
                 // $str = "[699590,3456576]";
                 $arr = json_decode($x['studentList'], true);
 
-                print_r($arr);
+                dd($arr);
 
                 
 
