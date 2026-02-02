@@ -2556,10 +2556,11 @@ class AttendanceController extends Controller
                 // dd($student_list1,$x['studentList']);
 
                 // $str = "[699590,3456576]";
-                $arr = json_decode($x['studentList'], true);
+                
 
+                $str = trim($x['studentList'], '"');          // remove starting/ending quotes
+                $arr = json_decode($str, true);
                 dd($arr);
-
                 
 
                 $rows = [];
