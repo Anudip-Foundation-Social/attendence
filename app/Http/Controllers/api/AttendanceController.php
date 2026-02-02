@@ -2953,7 +2953,7 @@ class AttendanceController extends Controller
                     ->update([
                       'status' => 0, 
                     ]); 
-                    $this->attendance_service_status();    
+                    //$this->attendance_service_status();    
             } else{
 
                 DB::table('attendance_service_status')
@@ -2961,7 +2961,7 @@ class AttendanceController extends Controller
                       'status' => 0,                        
                 ]); 
                 //$this->offlineSyncBulkPunchInOutAttendance(); 
-                $this->attendance_service_status();
+                //$this->attendance_service_status();
 
             }   
             //DB::commit(); 
