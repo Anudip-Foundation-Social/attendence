@@ -2599,11 +2599,11 @@ class AttendanceController extends Controller
                         'ContentType' => mime_content_type($localFilePath),
                     ]);
 
-                    DB::table('offline_student_sync_logs')->insertOrIgnore($rows);
+                    //DB::table('offline_student_sync_logs')->insertOrIgnore($rows);
 
                      $insertEligibleStudents = DB::table('offline_student_sync_logs')->insertGetId(
                         array(
-                            'attend_date'     => $x['attend_date'] ?? null,
+                        'attend_date'     => $x['attend_date'] ?? null,
                         'user_id' => $x['user_id'] ?? null,
                         'batch_id'        => $x['batch_id'] ?? null,   // FIXED
                         'batch_code'      => $x['batch_code'] ?? null,
