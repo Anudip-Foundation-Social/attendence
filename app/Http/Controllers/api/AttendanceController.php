@@ -3308,7 +3308,7 @@ class AttendanceController extends Controller
                           'status' => 0,   
                           'created_at'=>now()                       
                     ]); 
-            $this->offlineSyncBulkPunchInOutAttendance_cron();
+            //$this->offlineSyncBulkPunchInOutAttendance_cron();
 
         }  
         //dd('dd');     
