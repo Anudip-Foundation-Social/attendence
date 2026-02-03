@@ -2942,6 +2942,7 @@ class AttendanceController extends Controller
                         ->update([
                             'status' => 1,                        
                         ]); 
+                        $GLOBALS['id']=$x['id'];
 
                         //dd($incount,$x['id']);     
                             //}   
@@ -2969,6 +2970,12 @@ class AttendanceController extends Controller
             
 
         } catch (Exception $e) { 
+            
+
+            DB::table('offline_student_sync_logs')->where('id',$GLOBALS['id'])
+                        ->update([
+                            'status' => 2,                        
+                        ]);
             DB::table('attendance_service_status')
                 ->update([
                       'status' => 0,                        
