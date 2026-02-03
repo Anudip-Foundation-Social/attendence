@@ -3000,7 +3000,7 @@ class AttendanceController extends Controller
                             ->orderBy('id', 'asc')
                             ->limit(200)
                             ->get();
-               //dd($mail_content->toArray());
+            dd(sizeof($mail_content));
             if(sizeof($mail_content)){   
                
                 foreach($mail_content as $x){
