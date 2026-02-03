@@ -2969,7 +2969,11 @@ class AttendanceController extends Controller
             
 
         } catch (Exception $e) { 
-            DB::rollback();
+            DB::table('attendance_service_status')
+                ->update([
+                      'status' => 0,                        
+                ]); 
+            //DB::rollback();
             return $this->sendError($e->getMessage());
         }
     }
