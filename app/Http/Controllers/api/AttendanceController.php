@@ -2981,7 +2981,7 @@ class AttendanceController extends Controller
                       'status' => 0,                        
                 ]); 
             //DB::rollback();
-            dd($e);
+            dd($e,$GLOBALS['id']);
             return $this->sendError($e->getMessage());
         }
     }
