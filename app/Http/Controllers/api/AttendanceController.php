@@ -3302,6 +3302,14 @@ class AttendanceController extends Controller
             $this->offlineSyncBulkPunchInOutAttendance_cron(); 
             //$c=$this->snsService();
             //dd($c);        
+        }else{
+            DB::table('attendance_service_status')
+                    ->update([
+                          'status' => 0,   
+                          'created_at'=>now()                       
+                    ]); 
+            $this->offlineSyncBulkPunchInOutAttendance_cron();
+
         }  
         //dd('dd');     
     }
