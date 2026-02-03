@@ -35,6 +35,8 @@ Route::post('UpdateAttendance',[AttendanceController::class,'UpdateAttendance'])
 // Route::get('fetchDataForCheckingRedis',[AttendanceController::class,'fetchDataForCheckingRedis']);
 
 Route::get('offlineSyncBulkPunchInOutAttendance_cron',[AttendanceController::class,'offlineSyncBulkPunchInOutAttendance_cron']);
+
+Route::get('offlineSyncBulkPunchInOutAttendance_cron_batchwise/{batch_code}',[AttendanceController::class,'offlineSyncBulkPunchInOutAttendance_cron_batchwise']);
 Route::get('attendance_service_status',[AttendanceController::class,'attendance_service_status']);
 
 
