@@ -3001,7 +3001,7 @@ class AttendanceController extends Controller
                             ->limit(200)
                             ->get();
             //dd(sizeof($mail_content));
-            if(sizeof($mail_content)){   
+            if(sizeof($mail_content)>0){   
                
                 foreach($mail_content as $x){
                     $x=(array)$x;
