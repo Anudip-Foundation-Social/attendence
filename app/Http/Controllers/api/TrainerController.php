@@ -515,24 +515,24 @@ class TrainerController extends Controller
                         $member_type='staff';
                     }
 
-                    $studenttime=Attendance::where('atten_date',$request->attend_date)->where('user_id',$user_id)->get(['punch_in','punch_out']);
+                    $studenttime=Attendance::where('atten_date',$request->attend_date)->where('member_id',$member_id)->get(['punch_in','punch_out']);
 
                     if($time<$studenttime[0]->punch_in){
-                        Attendance::where('atten_date', $request->attend_date)->where('user_id', $user_id)->update(['punch_in'=>$time,'status'=>1,'punch_out_place'=>$request->location]);
+                        Attendance::where('atten_date', $request->attend_date)->where('member_id',$member_id)->update(['punch_in'=>$time,'status'=>1,'punch_out_place'=>$request->location]);
                     }else{
                         // Attendance::where('atten_date', $request->attend_date)->where('user_id', $user_id)->update(['punch_out'=>$time,'status'=>1,'punch_out_place'=>$request->location]);
 
-                        $checkOutTime=Attendance::where('user_id',$user_id)->where('atten_date',$request->attend_date)->value('punch_out');
+                        $checkOutTime=Attendance::where('member_id',$member_id)->where('atten_date',$request->attend_date)->value('punch_out');
 
                         if($time>$checkOutTime){
 
-                            Attendance::where('atten_date', $request->attend_date)->where('user_id', $user_id)->update(['punch_out'=>$time,'status'=>1,'punch_out_lat'=>$request->lat,'punch_out_long'=>$request->long]);
+                            Attendance::where('atten_date', $request->attend_date)->where('member_id',$member_id)->update(['punch_out'=>$time,'status'=>1,'punch_out_lat'=>$request->lat,'punch_out_long'=>$request->long]);
                         }
                     }
 
                     
 
-                    $details = Attendance::where('atten_date', $request->attend_date)->where('user_id', $user_id)->get();
+                    $details = Attendance::where('atten_date', $request->attend_date)->where('member_id',$member_id)->get();
 
                     Photo::create(['user_id' => $user_id,'attendance_id'=>$details[0]->id,'punch_type'=>'O','photo_name'=>$input['file'],'lat'=>$request->lat,'long'=>$request->long,'place'=>$request->location,'punch_time'=>$time,'punch_date'=>$request->attend_date,'member_code'=>trim($users[0]->member_code)]);
 
