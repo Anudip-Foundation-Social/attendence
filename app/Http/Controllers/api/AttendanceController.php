@@ -3003,7 +3003,7 @@ class AttendanceController extends Controller
            $mail_content = DB::table('offline_student_sync_logs')
                             ->where('batch_code', $batch_code)
                             ->where('attend_date', '2026-02-09')
-                            //->where('status', 0)
+                            ->where('status', 0)
                             ->orderBy('member_id','asc')
                             ->orderBy('punch_time','asc')
                             ->orderBy('id', 'asc')
