@@ -2692,10 +2692,13 @@ class AttendanceController extends Controller
        ini_set('max_execution_time', config('app.php_max_time'));
 	   ini_set('memory_limit', '4096M'); 
        //dd('d');
+      date_default_timezone_set('Asia/Kolkata');
         try { 
            //dd($request->all());
            $mail_content = DB::table('offline_student_sync_logs')
                             ->where('status', 0)
+                            ->orderBy('member_id','asc')
+                            ->orderBy('punch_time','asc')
                             ->orderBy('id', 'asc')
                             ->limit(200)
                             ->get();
@@ -2999,6 +3002,9 @@ class AttendanceController extends Controller
            $mail_content = DB::table('offline_student_sync_logs')
                             ->where('batch_code', $batch_code)
                             ->where('status', 0)
+                            ->orderBy('member_id','asc')
+                            ->orderBy('punch_time','asc')
+                            ->orderBy('id', 'asc')
                             ->orderBy('id', 'asc')
                             ->limit(200)
                             ->get();
