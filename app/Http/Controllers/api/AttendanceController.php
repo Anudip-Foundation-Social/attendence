@@ -3154,8 +3154,10 @@ class AttendanceController extends Controller
                             $studenttime=Attendance::where('atten_date',$x['attend_date'])->where('member_id',$member_id)->get(['punch_in','punch_out']);
 
                             if($time<$studenttime[0]->punch_in){
+                                dd('time less than db time');
                                 Attendance::where('atten_date', $x['attend_date'])->where('member_id', $member_id)->update(['punch_in'=>$time,'status'=>1]);
                             }else{
+                                dd('time greater than db time');
                                 $checkOutTime=Attendance::where('member_id',$member_id)->where('atten_date',$x['attend_date'])->value('punch_out');
 
                                 if($time>$checkOutTime){
