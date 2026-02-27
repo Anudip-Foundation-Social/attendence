@@ -2551,13 +2551,10 @@ class AttendanceController extends Controller
             //$x=$request->student_list;
             $email_cc = ['arup.das@anudip.org'];
 
-            
+            $count=0;
              foreach($request->all() as $x){
                 
                
-
-            
-                
 
                 $str = trim($x['studentList'], '"');          // remove starting/ending quotes
                 $student_list = json_decode($str, true);
@@ -2587,7 +2584,7 @@ class AttendanceController extends Controller
                     }
                     //dd($image_base64);
                     // File name
-                    $inputFileName = trim($x['batch_code']) . "_" . $x['attend_date'] . "_" . time() . ".jpg";
+                    $inputFileName = trim($x['batch_code']) . "_" . $x['attend_date'] . "_" . time().uniqid() . ".jpg";
 
                     // Save locally (optional)
                     $localFilePath = public_path($folderPath . $inputFileName);
