@@ -2683,6 +2683,7 @@ class AttendanceController extends Controller
      public function offlineSyncBulkPunchInOutAttendance_TEST(Request $request)
     {
         //DB::beginTransaction();
+        dd('dddd');
         ini_set('max_execution_time', config('app.php_max_time'));
         ini_set('memory_limit', '4096M');
 
@@ -2821,7 +2822,7 @@ class AttendanceController extends Controller
         }
     }
 
-    
+
 
 
     public function offlineSyncBulkPunchInOutAttendance1(Request $request)
