@@ -2821,6 +2821,8 @@ class AttendanceController extends Controller
         }
     }
 
+    
+
 
     public function offlineSyncBulkPunchInOutAttendance1(Request $request)
     {
