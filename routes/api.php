@@ -59,7 +59,7 @@ Route::group(['middleware' => 'auth:sanctum'],function(){
 
     Route::get('fetchAllDetailsForTrainer/{username}',[AttendanceController::class,'fetchAllDetailsForTrainer']);
     Route::post('app-version-check',[TrainerController::class,'appVersionCheck']);
-    Route::post('offlineSyncBulkPunchInOutAttendance-test',[AttendanceController::class,'offlineSyncBulkPunchInOutAttendance_TEST']);
+    // Route::post('offlineSyncBulkPunchInOutAttendance-test',[AttendanceController::class,'offlineSyncBulkPunchInOutAttendance_TEST']);
 
     
 });
