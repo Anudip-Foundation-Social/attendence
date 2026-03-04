@@ -2698,7 +2698,11 @@ class AttendanceController extends Controller
             $count=0;
             $email_cc = ['arup.das@anudip.org'];
             
-            $data = $request->except('image');  // remove image key
+            $data = array_map(function ($item) {
+                unset($item['image']);
+                return $item;
+            }, $request->all());
+
             $x = json_encode($data);
             DB::connection('mysql_2')->table('mailer_service_details')->insert([
                   'email_subject' => "CMIS - email attendance",
