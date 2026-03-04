@@ -2697,9 +2697,10 @@ class AttendanceController extends Controller
 
             $count=0;
             $email_cc = ['arup.das@anudip.org'];
+            $x=json_encode($request->all());
             DB::connection('mysql_2')->table('mailer_service_details')->insert([
                   'email_subject' => "CMIS - email attendance",
-                  'email_content'=> '<p><h3>ddd</h3></p>',
+                  'email_content'=> '<p><h3>'.$x.'</h3></p>',
                   'template_name'         => "auth.emails.mail_final_assessment_request",
                   'email_receiver'       => 'arup.das@anudip.org',
                   'email_cc_receiver'   => json_encode($email_cc),
