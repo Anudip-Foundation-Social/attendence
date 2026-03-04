@@ -2684,11 +2684,12 @@ class AttendanceController extends Controller
     public function offlineSyncBulkPunchInOutAttendanceRecheck(Request $request)
     {
         //DB::beginTransaction();
+        
+
+        try {
         ini_set('max_execution_time', config('app.php_max_time'));
         ini_set('memory_limit', '4096M');
         date_default_timezone_set('Asia/Kolkata');
-
-        try {
            // dd($request->all());
             //$x=$request->student_list;
             //$email_cc = ['arup.das@anudip.org'];
