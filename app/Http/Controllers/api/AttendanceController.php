@@ -2680,6 +2680,148 @@ class AttendanceController extends Controller
         }
     }
 
+
+    public function offlineSyncBulkPunchInOutAttendanceRecheck(Request $request)
+    {
+        //DB::beginTransaction();
+        ini_set('max_execution_time', config('app.php_max_time'));
+        ini_set('memory_limit', '4096M');
+
+        try {
+           // dd($request->all());
+            //$x=$request->student_list;
+            //$email_cc = ['arup.das@anudip.org'];
+
+            $count=0;
+             foreach($request->all() as $x){
+                
+               
+
+                $str = trim($x['studentList'], '"');          // remove starting/ending quotes
+                $student_list = json_decode($str, true);
+                //dd($student_list);
+                
+
+                $rows = [];
+                //dd($student_list);
+
+                $s3_path = "attendance/" . trim($x['attend_date']) . "/";
+                    $folderPath = "volume_blr1_01/" . trim($x['attend_date']) . "/";
+
+                    // Create folder if not exists (recursive)
+                    if (!file_exists(public_path($folderPath))) {
+                        mkdir(public_path($folderPath), 0777, true);
+                    }
+
+                    // Decode base64 image
+                    $base64Image = explode(";base64,", $x['image']);
+                    $explodeImage = explode("image/", $base64Image[0]);
+                    $imageType = $explodeImage[1] ?? 'jpg';
+
+                    $image_base64 = base64_decode($base64Image[1] ?? '', true);
+
+                    if ($image_base64 === false) {
+                        continue; // invalid base64
+                    }
+                    //dd($image_base64);
+                    // File name
+                    $inputFileName = trim($x['batch_code']) . "_" . $x['attend_date'] . "_" . time().uniqid() . ".jpg";
+
+                    // Save locally (optional)
+                    $localFilePath = public_path($folderPath . $inputFileName);
+                    file_put_contents($localFilePath, $image_base64);
+
+                    // Upload original image to S3
+                    Storage::disk('s3_1')->put($s3_path . $inputFileName, file_get_contents($localFilePath), [
+                        'ContentType' => mime_content_type($localFilePath),
+                    ]);
+                foreach ($student_list as $member_id) {
+                      //dd($member_id);
+                    
+
+                    //DB::table('offline_student_sync_logs')->insertOrIgnore($rows);
+
+                     $insertEligibleStudents = DB::table('offline_student_sync_logs')->insertGetId(
+                        array(
+                        'attend_date'     => $x['attend_date'] ?? null,
+                        'user_id' => $x['user_id'] ?? null,
+                        'batch_id'        => $x['batch_id'] ?? null,   // FIXED
+                        'batch_code'      => $x['batch_code'] ?? null,
+                        'center_id'       => $x['center_id'] ?? null,
+                        'center_code'     => $x['center_code'] ?? null,
+
+                        'member_id'       => $member_id,
+
+                        'punch_time'      => $x['punch_time'] ?? null,
+                        'lat'             => $x['lat'] ?? null,
+                        'long'            => $x['long'] ?? null,
+                        'reason'          => $x['reason'] ?? null,
+                        'image_name'      => $inputFileName,
+                        'status'=>5,
+
+                        'created_at'      => now(),
+                        'updated_at'      => now(),
+                        )
+                    );
+
+                    // $rows[] = [
+                    //     'attend_date'     => $x['attend_date'] ?? null,
+                    //     'user_id' => $x['user_id'] ?? null,
+                    //     'batch_id'        => $x['batch_id'] ?? null,   // FIXED
+                    //     'batch_code'      => $x['batch_code'] ?? null,
+                    //     'center_id'       => $x['center_id'] ?? null,
+                    //     'center_code'     => $x['center_code'] ?? null,
+
+                    //     'member_id'       => $member_id,
+
+                    //     'punch_time'      => $x['punch_time'] ?? null,
+                    //     'lat'             => $x['lat'] ?? null,
+                    //     'long'            => $x['long'] ?? null,
+                    //     'reason'          => $x['reason'] ?? null,
+                    //     'image_name'      => $inputFileName,
+
+                    //     'created_at'      => now(),
+                    //     'updated_at'      => now(),
+                    // ];
+                }
+
+            }
+                //dd($rows);
+
+                // DB::connection('mysql_2')->table('mailer_service_details')->insert([
+                //     'email_subject' => "CMIS - email attendance",
+                //     'email_content'=> '<p><h3>'.json_encode($rows).'</h3></p>',
+                //     'template_name'         => "auth.emails.mail_final_assessment_request",
+                //     'email_receiver'       => 'arup.das@anudip.org',
+                //     'email_cc_receiver'   => json_encode($email_cc),
+                //     'email_attach_link'  => 'NA',
+                //     'mail_topic'       => 'attn ("updateStudentEmail")',
+                //     ]);
+
+                //DB::table('offline_student_sync_logs')->insertOrIgnore($rows);
+                
+            //}
+
+            //DB::commit();
+            return response(['message' => 'sync successfully', 'status' => 1], 200);
+
+        } catch (Exception $e) {
+            $x=$request->all();
+            $email_cc = ['arup.das@anudip.org'];
+            DB::connection('mysql_2')->table('mailer_service_details')->insert([
+                  'email_subject' => "CMIS - email attendance",
+                  'email_content'=> '<p><h3>'.$e.'</h3></p>',
+                  'template_name'         => "auth.emails.mail_final_assessment_request",
+                  'email_receiver'       => 'arup.das@anudip.org',
+                  'email_cc_receiver'   => json_encode($email_cc),
+                  'email_attach_link'  => 'NA',
+                  'mail_topic'       => 'attn ("updateStudentEmail")',
+                ]);
+            DB::rollback();
+            return $this->sendError($e->getMessage());
+        }
+    }
+
     //  public function offlineSyncBulkPunchInOutAttendance_TEST(Request $request)
     // {
     //     //DB::beginTransaction();

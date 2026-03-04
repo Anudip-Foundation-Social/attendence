@@ -61,6 +61,8 @@ Route::group(['middleware' => 'auth:sanctum'],function(){
     Route::post('app-version-check',[TrainerController::class,'appVersionCheck']);
     // Route::post('offlineSyncBulkPunchInOutAttendance-test',[AttendanceController::class,'offlineSyncBulkPunchInOutAttendance_TEST']);
 
+    Route::post('offlineSyncBulkPunchInOutAttendance-recheck',[AttendanceController::class,'offlineSyncBulkPunchInOutAttendanceRecheck']);
+
     
 });
 
