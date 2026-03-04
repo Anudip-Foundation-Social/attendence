@@ -2823,6 +2823,7 @@ class AttendanceController extends Controller
             return $this->sendError($e->getMessage());
         }
     }
+    
 
     //  public function offlineSyncBulkPunchInOutAttendance_TEST(Request $request)
     // {
