@@ -2689,7 +2689,7 @@ class AttendanceController extends Controller
         try {
         ini_set('max_execution_time', config('app.php_max_time'));
         ini_set('memory_limit', '4096M');
-        date_default_timezone_set('Asia/Kolkata');
+        //date_default_timezone_set('Asia/Kolkata');
            // dd($request->all());
             //$x=$request->student_list;
             //$email_cc = ['arup.das@anudip.org'];
@@ -2823,7 +2823,7 @@ class AttendanceController extends Controller
             return $this->sendError($e->getMessage());
         }
     }
-    
+
 
     //  public function offlineSyncBulkPunchInOutAttendance_TEST(Request $request)
     // {
