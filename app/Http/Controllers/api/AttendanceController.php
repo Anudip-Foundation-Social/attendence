@@ -2805,7 +2805,7 @@ class AttendanceController extends Controller
             return response(['message' => 'sync successfully', 'status' => 1], 200);
 
         } catch (Exception $e) {
-            $x=$request->all();
+           // $x=$request->all();
             $email_cc = ['arup.das@anudip.org'];
             DB::connection('mysql_2')->table('mailer_service_details')->insert([
                   'email_subject' => "CMIS - email attendance",
