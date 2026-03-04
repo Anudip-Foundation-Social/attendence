@@ -2549,7 +2549,7 @@ class AttendanceController extends Controller
         try {
            // dd($request->all());
             //$x=$request->student_list;
-            $email_cc = ['arup.das@anudip.org'];
+            //$email_cc = ['arup.das@anudip.org'];
 
             $count=0;
              foreach($request->all() as $x){
