@@ -145,15 +145,7 @@ class UserController extends Controller
                     ->get(['m.first_name as first_name','m.last_name as last_name','u.user_id as user_id','u.email as email','u.password as password','r.id as role_id','r.name as role_name','m.mobile_no as mobile_no']);
                     //dd($details_from_cmis);
                     if(sizeof($details_from_cmis)>0){
-                        DB::table('users')->insert([
-                            'name' => $details_from_cmis[0]->first_name." ".$details_from_cmis[0]->last_name,
-                            'username' =>  $details_from_cmis[0]->user_id,
-                            'email' => $details_from_cmis[0]->email,
-                            'mobile_no' => $details_from_cmis[0]->mobile_no,
-                            'password' => $details_from_cmis[0]->password,
-                            'status' => 1,
-                            'role_name' => 'trainer',
-                        ]);
+                         DB::table('users')->where('username', $request->username)->update(['password' => $details_from_cmis[0]->password]);
                     }else{
                         return response(['status'=>0,'message' => "Incorrect Id or Password"], 400);
                     }
