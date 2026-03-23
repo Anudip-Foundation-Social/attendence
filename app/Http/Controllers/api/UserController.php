@@ -180,10 +180,11 @@ class UserController extends Controller
         //dd($anudip);
 
         if($anudip !== false || $tempCheck !== false || $adiCheck!==false){
-            dd("ok");
+            //dd("ok");
             $user_id_count=DB::table('users')
             ->where('username', $request->username)
             ->count();
+            dd($user_id_count);
             if($user_id_count==0){
                 
                 //if($anudip !== false ){
