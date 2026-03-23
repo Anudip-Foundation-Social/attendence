@@ -177,7 +177,7 @@ class UserController extends Controller
         $anudip = strpos(strtoupper($request->username), 'ANP');
         $tempCheck = strpos(strtoupper($request->username), 'TEMP');
         $adiCheck = strpos(strtoupper($request->username), 'ADI');
-        dd($anudip);
+        //dd($anudip);
 
         if($anudip !== false || $tempCheck !== false || $adiCheck!==false){
             dd("ok");
