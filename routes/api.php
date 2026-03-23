@@ -27,6 +27,7 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 ///////.............FROM 2025-08-29 STUDENT PART IS CLOSED ONLY TRAINER PART IS PRESENT IN THIS APP.....//////
 //Route::post('login',[UserController::class,'loginUser']);
 Route::post('login',[UserController::class,'loginUserForTrainer']);
+Route::post('login-check',[UserController::class,'loginUserForTrainer_check']);
 Route::post('login-student',[UserController::class,'loginUserForStudent']);
 //Route::post('insertIntoAttendanceFromCMIS',[AttendanceController::class,'insertIntoAttendanceFromCMIS']);
 Route::post('UpdateAttendance',[AttendanceController::class,'UpdateAttendance']);
